@@ -1,0 +1,436 @@
+import { useEffect, useState } from 'react'
+
+interface Supply {
+  id: number
+  name: string
+  type: string
+  quantity: number
+  unit: string
+  cost_per_unit: number
+  supplier: string
+  notes: string
+}
+
+interface SupplyFormModalProps {
+  isOpen: boolean
+  onClose: () => void
+  mode: 'create' | 'edit'
+  supply?: Supply | null
+  onSubmit: (data: {
+    name: string
+    type: string
+    quantity: number
+    unit: string
+    cost_per_unit: number
+    supplier: string
+    notes: string
+  }) => void
+  isSubmitting: boolean
+}
+
+const SUPPLY_TYPES = [
+  { value: 'metal', label: 'Metal' },
+  { value: 'gemstone', label: 'Gemstone' },
+  { value: 'tool', label: 'Tool' },
+  { value: 'packaging', label: 'Packaging' },
+  { value: 'other', label: 'Other' },
+]
+
+export default function SupplyFormModal({
+  isOpen,
+  onClose,
+  mode,
+  supply,
+  onSubmit,
+  isSubmitting,
+}: SupplyFormModalProps) {
+  const [formData, setFormData] = useState({
+    name: '',
+    type: '',
+    quantity: '',
+    unit: '',
+    cost_per_unit: '',
+    supplier: '',
+    notes: '',
+  })
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Initialize form data when modal opens or supply changes
+  useEffect(() => {
+    if (isOpen) {
+      if (mode === 'edit' && supply) {
+        setFormData({
+          name: supply.name,
+          type: supply.type,
+          quantity: supply.quantity.toString(),
+          unit: supply.unit,
+          cost_per_unit: supply.cost_per_unit?.toString() || '',
+          supplier: supply.supplier || '',
+          notes: supply.notes || '',
+        })
+      } else {
+        setFormData({
+          name: '',
+          type: '',
+          quantity: '',
+          unit: '',
+          cost_per_unit: '',
+          supplier: '',
+          notes: '',
+        })
+      }
+      setErrors({})
+    }
+  }, [isOpen, mode, supply])
+
+  // Handle ESC key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [isOpen, onClose])
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {}
+
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required'
+    }
+
+    if (!formData.type) {
+      newErrors.type = 'Type is required'
+    }
+
+    if (!formData.quantity.trim()) {
+      newErrors.quantity = 'Quantity is required'
+    } else {
+      const qty = parseFloat(formData.quantity)
+      if (isNaN(qty) || qty <= 0) {
+        newErrors.quantity = 'Quantity must be a positive number'
+      }
+    }
+
+    if (!formData.unit.trim()) {
+      newErrors.unit = 'Unit is required'
+    }
+
+    if (formData.cost_per_unit.trim()) {
+      const cost = parseFloat(formData.cost_per_unit)
+      if (isNaN(cost) || cost < 0) {
+        newErrors.cost_per_unit = 'Cost per unit must be a positive number'
+      }
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!validate()) {
+      return
+    }
+
+    onSubmit({
+      name: formData.name.trim(),
+      type: formData.type,
+      quantity: parseFloat(formData.quantity),
+      unit: formData.unit.trim(),
+      cost_per_unit: formData.cost_per_unit.trim() ? parseFloat(formData.cost_per_unit) : 0,
+      supplier: formData.supplier.trim(),
+      notes: formData.notes.trim(),
+    })
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <div
+      className="fixed inset-0 z-50 overflow-y-auto"
+      aria-labelledby="modal-title"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        {/* Backdrop */}
+        <div
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          aria-hidden="true"
+          onClick={onClose}
+        ></div>
+
+        {/* Center modal */}
+        <span
+          className="hidden sm:inline-block sm:align-middle sm:h-screen"
+          aria-hidden="true"
+        >
+          &#8203;
+        </span>
+
+        {/* Modal panel */}
+        <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-6">
+          <div className="absolute top-0 right-0 pt-4 pr-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              <span className="sr-only">Close</span>
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div className="sm:flex sm:items-start">
+            <div className="w-full">
+              <h3
+                className="text-lg leading-6 font-medium text-gray-900 mb-4"
+                id="modal-title"
+              >
+                {mode === 'create' ? 'Add New Supply' : 'Edit Supply'}
+              </h3>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Name Input */}
+                <div>
+                  <label
+                    htmlFor="supply-name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="supply-name"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
+                    className={`mt-1 block w-full border ${
+                      errors.name ? 'border-red-300' : 'border-gray-300'
+                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                    placeholder="e.g., 14K Gold Wire"
+                  />
+                  {errors.name && (
+                    <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                  )}
+                </div>
+
+                {/* Type Dropdown */}
+                <div>
+                  <label
+                    htmlFor="supply-type"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Type <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="supply-type"
+                    value={formData.type}
+                    onChange={(e) =>
+                      setFormData({ ...formData, type: e.target.value })
+                    }
+                    className={`mt-1 block w-full border ${
+                      errors.type ? 'border-red-300' : 'border-gray-300'
+                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                  >
+                    <option value="">Select a type</option>
+                    {SUPPLY_TYPES.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.type && (
+                    <p className="mt-1 text-sm text-red-600">{errors.type}</p>
+                  )}
+                </div>
+
+                {/* Quantity and Unit Row */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      htmlFor="supply-quantity"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Quantity <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      id="supply-quantity"
+                      value={formData.quantity}
+                      onChange={(e) =>
+                        setFormData({ ...formData, quantity: e.target.value })
+                      }
+                      className={`mt-1 block w-full border ${
+                        errors.quantity ? 'border-red-300' : 'border-gray-300'
+                      } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      placeholder="0"
+                    />
+                    {errors.quantity && (
+                      <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="supply-unit"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Unit <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="supply-unit"
+                      value={formData.unit}
+                      onChange={(e) =>
+                        setFormData({ ...formData, unit: e.target.value })
+                      }
+                      className={`mt-1 block w-full border ${
+                        errors.unit ? 'border-red-300' : 'border-gray-300'
+                      } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      placeholder="e.g., grams, pieces"
+                    />
+                    {errors.unit && (
+                      <p className="mt-1 text-sm text-red-600">{errors.unit}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Cost Per Unit */}
+                <div>
+                  <label
+                    htmlFor="supply-cost"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Cost Per Unit
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    id="supply-cost"
+                    value={formData.cost_per_unit}
+                    onChange={(e) =>
+                      setFormData({ ...formData, cost_per_unit: e.target.value })
+                    }
+                    className={`mt-1 block w-full border ${
+                      errors.cost_per_unit ? 'border-red-300' : 'border-gray-300'
+                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                    placeholder="0.00"
+                  />
+                  {errors.cost_per_unit && (
+                    <p className="mt-1 text-sm text-red-600">{errors.cost_per_unit}</p>
+                  )}
+                </div>
+
+                {/* Supplier */}
+                <div>
+                  <label
+                    htmlFor="supply-supplier"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Supplier
+                  </label>
+                  <input
+                    type="text"
+                    id="supply-supplier"
+                    value={formData.supplier}
+                    onChange={(e) =>
+                      setFormData({ ...formData, supplier: e.target.value })
+                    }
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="e.g., ABC Metals Inc."
+                  />
+                </div>
+
+                {/* Notes */}
+                <div>
+                  <label
+                    htmlFor="supply-notes"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Notes
+                  </label>
+                  <textarea
+                    id="supply-notes"
+                    rows={3}
+                    value={formData.notes}
+                    onChange={(e) =>
+                      setFormData({ ...formData, notes: e.target.value })
+                    }
+                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    placeholder="Additional information about this supply"
+                  />
+                </div>
+
+                {/* Action Buttons */}
+                <div className="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        {mode === 'create' ? 'Creating...' : 'Updating...'}
+                      </>
+                    ) : mode === 'create' ? (
+                      'Create Supply'
+                    ) : (
+                      'Update Supply'
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isSubmitting}
+                    onClick={onClose}
+                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
