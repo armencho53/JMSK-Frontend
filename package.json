@@ -9,11 +9,6 @@
     "build:prod": "tsc && vite build --mode production",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "analyze": "vite build --mode production && npx vite-bundle-visualizer",
-    "analyze:bundle": "npm run build:prod && node scripts/analyze-bundle.js",
-    "analyze:deps": "node scripts/analyze-bundle.js --deps",
-    "analyze:report": "npm run build:prod && node scripts/analyze-bundle.js --report",
-    "optimize": "npm run build:prod && npm run analyze:bundle",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
@@ -52,7 +47,7 @@
     "tailwindcss": "^3.3.6",
     "terser": "^5.44.1",
     "ts-jest": "^29.4.6",
-    "typescript": "^5.2.2",
+    "typescript": "^5.9.3",
     "vite": "^5.0.8"
   }
 }

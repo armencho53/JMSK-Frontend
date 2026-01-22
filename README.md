@@ -266,239 +266,49 @@ The script will:
 - React 18
 - TypeScript
 - Vite
-- TailwindCSS (with custom jewelry-inspired design system)
+- TailwindCSS
 - React Router
-- TanStack React Query 5.12.2 (server state management)
+- TanStack React Query (server state management)
 - Zustand (client state management)
 - Axios (HTTP client)
 - Jest + Testing Library (testing framework)
-- Fast-check (property-based testing)
 
 ## Design System
 
-The application features a clean modern professional design system with a complete component library:
+The application features a clean modern professional design system focused on core functionality.
 
 ### UI Components
 
-#### Navigation Components
+#### Core Components (In Active Use)
 
 - **Layout**: Main application layout with professional sidebar navigation and header
-  ```typescript
-  import Layout from './components/Layout';
-  
-  // Used as route wrapper in App.tsx
-  <Route path="/" element={<Layout />}>
-    <Route index element={<Dashboard />} />
-    <Route path="supplies" element={<Supplies />} />
-    // ... other routes
-  </Route>
-  ```
-  
-  **Features:**
-  - **Fixed Sidebar**: 256px wide professional dark sidebar with company branding
-  - **Navigation Menu**: Icon-based navigation with active state indicators and hover effects
-  - **User Profile**: Bottom-positioned user section with avatar, email, tenant info, and logout
-  - **Dynamic Header**: Page-specific titles with system status and date display
-  - **Professional Styling**: Slate color palette with orange accent for active states
-
-- **MobileNavigation**: Enhanced mobile navigation with theme support and touch-friendly interactions
-  ```typescript
-  import { MobileNavigation } from './components/ui';
-  
-  <MobileNavigation 
-    isOpen={isOpen}
-    onClose={handleClose}
-  />
-  ```
-
-- **BottomNavigation**: Mobile bottom navigation bar for primary actions
-  ```typescript
-  import { BottomNavigation } from './components/ui';
-  
-  <BottomNavigation className="custom-styles" />
-  ```
-
-#### Data Display Components
-
-- **Table**: Enhanced data table with sorting, pagination, row selection, and responsive design
-  ```typescript
-  import { Table } from './components/ui';
-  
-  const columns = [
-    { key: 'name', title: 'Name', dataIndex: 'name', sortable: true },
-    { key: 'status', title: 'Status', render: (status) => <StatusBadge status={status} /> }
-  ];
-  
-  <Table 
-    columns={columns} 
-    data={orders}
-    pagination={{ current: 1, pageSize: 10, total: 100, onChange: handlePageChange }}
-    rowSelection={{ selectedRowKeys, onChange: handleSelectionChange }}
-    responsive
-    hoverable
-  />
-  ```
-
-- **Dashboard Statistics Cards**: Professional metrics display with hover effects
-  ```typescript
-  // Modern statistics card with icon and hover effects
-  <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-200">
-    <div className="flex items-center">
-      <div className="w-12 h-12 bg-slate-900 rounded-lg flex items-center justify-center">
-        <div className="w-6 h-6 bg-white rounded-sm"></div>
-      </div>
-      <div className="ml-4">
-        <p className="text-sm font-medium text-slate-600">Total Supplies</p>
-        <p className="text-2xl font-semibold text-slate-900">{count}</p>
-      </div>
-    </div>
-  </div>
-  ```
-
-- **StatusBadge**: Color-coded status indicators with multiple variants
-  ```typescript
-  // Status badge with professional styling
-  <span className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${
-    status === 'completed' 
-      ? 'bg-green-100 text-green-800' 
-      : status === 'in_progress'
-      ? 'bg-orange-100 text-orange-800'
-      : 'bg-slate-100 text-slate-800'
-  }`}>
-    {status?.replace('_', ' ') || 'pending'}
-  </span>
-  ```
-
-- **ProgressBar**: Manufacturing progress visualization with animations
-- **Timeline**: Step-by-step process visualization
-
-#### Form Components
-
 - **Button**: Primary, secondary, and tertiary variants with loading states
-- **Input**: Floating label and standard variants with validation
-- **Select**: Searchable dropdown with custom options
-- **DatePicker**: Calendar interface with theme integration
-- **FileUpload**: Drag-and-drop file upload with preview
+- **Input**: Text input with validation support
+- **Select**: Dropdown selection component
+- **Card**: Flexible card component with header, content, and footer sections
+- **Table**: Data table with sorting and pagination
+- **StatusBadge**: Color-coded status indicators
+- **ProgressBar**: Progress visualization
+- **Timeline**: Step-by-step process visualization
+- **Modal**: Dialog component with focus management
+- **ConfirmationDialog**: Confirmation prompts
+- **LoadingOverlay**: Loading state indicator
+- **FormModal**: Modal wrapper for forms
 
 #### Layout Components
 
-- **Card**: Flexible card component with multiple variants and subcomponents
-  ```typescript
-  import { Card, CardHeader, CardTitle, CardContent, CardFooter } from './components/ui';
-  
-  <Card variant="elevated" hoverable onClick={handleClick}>
-    <CardHeader>
-      <CardTitle as="h3">Order #12345</CardTitle>
-    </CardHeader>
-    <CardContent>
-      <p>Order details and information</p>
-    </CardContent>
-    <CardFooter>
-      <Button variant="primary">View Details</Button>
-    </CardFooter>
-  </Card>
-  ```
-  - **Variants**: `default`, `elevated`, `outlined`, `glass`
-  - **Subcomponents**: `CardHeader`, `CardTitle`, `CardContent`, `CardFooter`
-  - **Interactive**: Supports `onClick` for clickable cards with proper accessibility
-  - **Theming**: Full CSS custom properties integration for all themes
-
-- **Grid**: Responsive grid system with flexible columns
+- **Grid**: Responsive grid system
+- **Flex**: Flexbox layout utilities
 - **Container**: Responsive container with size variants
 - **Stack**: Vertical and horizontal layout utilities
 
-#### Responsive Layout Components
-
-- **ResponsiveContainer**: Flexible container with size variants and responsive padding
-  ```typescript
-  import { ResponsiveContainer } from './components/ui';
-  
-  <ResponsiveContainer size="desktop" padding="responsive">
-    <h1>Page Content</h1>
-  </ResponsiveContainer>
-  ```
-
-- **ResponsiveGrid**: Mobile-first grid system with automatic column adaptation
-  ```typescript
-  import { ResponsiveGrid } from './components/ui';
-  
-  <ResponsiveGrid type="cards" gap="md">
-    <div>Card 1</div>
-    <div>Card 2</div>
-    <div>Card 3</div>
-  </ResponsiveGrid>
-  ```
-
-- **ResponsiveStack**: Vertical layout component with responsive spacing
-  ```typescript
-  import { ResponsiveStack } from './components/ui';
-  
-  <ResponsiveStack spacing="lg" align="center">
-    <h2>Title</h2>
-    <p>Content</p>
-    <button>Action</button>
-  </ResponsiveStack>
-  ```
-
-- **TouchTarget**: Touch-friendly wrapper ensuring minimum 44px touch targets
-  ```typescript
-  import { TouchTarget } from './components/ui';
-  
-  <TouchTarget size="lg" as="button" onClick={handleClick}>
-    Touch-friendly Button
-  </TouchTarget>
-  ```
-
-#### Media Components
-
-- **Image**: Advanced responsive image component with srcSet support
-  ```typescript
-  import { Image } from './components/ui';
-  
-  // Simple usage
-  <Image src="/product.jpg" alt="Product photo" aspectRatio="square" />
-  
-  // Responsive images with multiple sources
-  <Image 
-    src={[
-      { src: '/product-400.jpg', width: 400 },
-      { src: '/product-800.jpg', width: 800 },
-      { src: '/product-1200.jpg', width: 1200 }
-    ]}
-    alt="Product photo"
-    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-    aspectRatio="4:3"
-    priority={true} // For above-the-fold images
-    fallbackSrc="/placeholder.jpg"
-  />
-  ```
-
-- **PhotoGallery**: Grid-based photo gallery with lightbox functionality
-  ```typescript
-  import { PhotoGallery } from './components/ui';
-  
-  <PhotoGallery 
-    photos={photos}
-    columns={3}
-    aspectRatio="square"
-    enableLightbox={true}
-    showCaptions={true}
-    responsive={true}
-  />
-  ```
-
-- **FilePreview**: Document and file preview with type-specific icons
-- **MediaGallery**: Mixed media content display for images, videos, and documents
-
 ### Component Features
 
-- **Professional Styling**: All components use consistent professional design with Tailwind CSS classes
-- **Responsive Design**: Mobile-first approach with touch-friendly interactions and adaptive layouts
-- **Accessibility**: WCAG 2.1 AA compliant with proper ARIA labels, keyboard navigation, and minimum touch targets
-- **TypeScript**: Full TypeScript support with comprehensive type definitions and polymorphic component support
+- **Professional Styling**: Consistent design with Tailwind CSS
+- **Responsive Design**: Mobile-first approach
+- **Accessibility**: WCAG 2.1 AA compliant with proper ARIA labels and keyboard navigation
+- **TypeScript**: Full TypeScript support with comprehensive type definitions
 - **Loading States**: Built-in loading and empty state handling
-- **Touch-Friendly**: Minimum 44px touch targets for mobile accessibility
-- **Optimized Performance**: Single-theme implementation reduces bundle size and improves loading performance
 
 ## Design System
 
