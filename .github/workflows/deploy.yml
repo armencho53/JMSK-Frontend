@@ -1,0 +1,249 @@
+name: Deploy Frontend to AWS
+
+on:
+  push:
+    branches:
+      - develop
+      - staging
+      - main
+  pull_request:
+    branches:
+      - develop
+      - staging
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      backend_url:
+        description: 'Backend UR (optional - if BACKEND_URL is set)'
+        required: false
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  determine-environment:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.set-env.outputs.environment }}
+      aws-role: ${{ steps.set-env.outputs.aws-role }}
+      backend-url: ${{ steps.set-env.outputs.backend-url }}
+    steps:
+      - name: Determine environment
+        id: set-env
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            ENV="${{ github.event.inputs.environment }}"
+          elif [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            ENV="production"
+          elif [ "${{ github.ref }}" == "refs/heads/staging" ]; then
+            ENV="staging"
+          else
+            ENV="development"
+          fi
+          
+          echo "environment=$ENV" >> $GITHUB_OUTPUT
+          
+          case $ENV in
+            production)
+              echo "aws-role=${{ secrets.AWS_ROLE_ARN_PROD }}" >> $GITHUB_OUTPUT
+              ;;
+            staging)
+              echo "aws-role=${{ secrets.AWS_ROLE_ARN_STAGE }}" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "aws-role=${{ secrets.AWS_ROLE_ARN_DEV }}" >> $GITHUB_OUTPUT              
+              ;;
+          esac
+
+          echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL }}" >> $GITHUB_OUTPUT
+
+  build:
+    runs-on: ubuntu-latest
+    needs: determine-environment
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run unit tests
+        run: npm run test:coverage
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            coverage/
+            junit.xml
+
+      - name: Build application
+        env:
+          VITE_API_URL: ${{ needs.determine-environment.outputs.backend-url }}
+        run: |
+          if [ "${{ needs.determine-environment.outputs.environment }}" == "production" ]; then
+            npm run build:prod
+          else
+            npm run build
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ needs.determine-environment.outputs.environment }}
+          path: dist/
+          retention-days: 7
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: [determine-environment, build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ needs.determine-environment.outputs.environment }}
+          path: dist/
+
+      - name: Start preview server
+        run: |
+          npm run preview &
+          echo $! > preview.pid
+          sleep 5
+
+      - name: Run integration tests
+        env:
+          BACKEND_URL: ${{ needs.determine-environment.outputs.backend-url }}
+          FRONTEND_URL: http://localhost:4173
+        run: |
+          npx playwright install --with-deps chromium
+          node tests/integration/backend-integration.test.js
+
+      - name: Stop preview server
+        if: always()
+        run: |
+          if [ -f preview.pid ]; then
+            kill $(cat preview.pid) || true
+          fi
+
+      - name: Upload integration test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results-${{ needs.determine-environment.outputs.environment }}
+          path: tests/integration/results/
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [determine-environment, build, integration-test]
+    if: github.event_name != 'pull_request'
+    environment:
+      name: ${{ needs.determine-environment.outputs.environment }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ needs.determine-environment.outputs.environment }}
+          path: dist/
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ needs.determine-environment.outputs.aws-role }}
+          aws-region: us-east-1
+          role-session-name: GitHubActions-${{ github.run_id }}
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync dist/ s3://${{ vars.S3_BUCKET_NAME }}-${{ needs.determine-environment.outputs.environment }}/ \
+            --delete \
+            --cache-control "public, max-age=31536000, immutable" \
+            --exclude "index.html" \
+            --exclude "*.html"
+          
+          aws s3 sync dist/ s3://${{ vars.S3_BUCKET_NAME }}-${{ needs.determine-environment.outputs.environment }}/ \
+            --exclude "*" \
+            --include "*.html" \
+            --cache-control "public, max-age=0, must-revalidate"
+
+      - name: Invalidate CloudFront cache
+        if: vars.CLOUDFRONT_DISTRIBUTION_ID != ''
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}-${{ needs.determine-environment.outputs.environment }} \
+            --paths "/*"
+
+      - name: Deployment summary
+        run: |
+          echo "## Deployment Summary :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ needs.determine-environment.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Backend URL**: ${{ needs.determine-environment.outputs.backend-url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Deployment completed successfully! :white_check_mark:" >> $GITHUB_STEP_SUMMARY
+
+  smoke-test:
+    runs-on: ubuntu-latest
+    needs: [determine-environment, deploy]
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run smoke tests
+        env:
+          BACKEND_URL: ${{ needs.determine-environment.outputs.backend-url }}
+          FRONTEND_URL: ${{ vars.FRONTEND_URL }}-${{ needs.determine-environment.outputs.environment }}
+        run: |
+          npx playwright install --with-deps chromium
+          node tests/smoke/post-deployment.test.js
+
+      - name: Upload smoke test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-results-${{ needs.determine-environment.outputs.environment }}
+          path: tests/smoke/results/
