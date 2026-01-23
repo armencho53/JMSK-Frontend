@@ -16,13 +16,14 @@ on:
       environment:
         description: 'Environment to deploy'
         required: true
+        default: development
         type: choice
         options:
           - development
           - staging
           - production
       backend_url:
-        description: 'Backend UR (optional - if BACKEND_URL is set)'
+        description: 'Backend URL (optional - if BACKEND_URL is set)'
         required: false
         type: string
 
@@ -57,16 +58,17 @@ jobs:
           case $ENV in
             production)
               echo "aws-role=${{ secrets.AWS_ROLE_ARN_PROD }}" >> $GITHUB_OUTPUT
+              echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL_PROD }}" >> $GITHUB_OUTPUT
               ;;
             staging)
               echo "aws-role=${{ secrets.AWS_ROLE_ARN_STAGE }}" >> $GITHUB_OUTPUT
+              echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL_STAGE }}" >> $GITHUB_OUTPUT
               ;;
             *)
-              echo "aws-role=${{ secrets.AWS_ROLE_ARN_DEV }}" >> $GITHUB_OUTPUT              
+              echo "aws-role=${{ secrets.AWS_ROLE_ARN_DEV }}" >> $GITHUB_OUTPUT     
+              echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL_DEV }}" >> $GITHUB_OUTPUT         
               ;;
           esac
-
-          echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL }}" >> $GITHUB_OUTPUT
 
   build:
     runs-on: ubuntu-latest

@@ -139,21 +139,21 @@ Here's an example of what filled values might look like:
 
 ```bash
 # Development
-AWS_ROLE_ARN_DEV=arn:aws:iam::123456789012:role/GitHubActions-Dev
-BACKEND_URL_DEV=https://api-dev.jewelry-mfg.com
-FRONTEND_URL_DEV=https://dev.jewelry-mfg.com
-S3_BUCKET_NAME=jewelry-mfg-frontend
+AWS_ROLE_ARN_DEV=arn:aws:iam::139984030807:role/github-actions-dev
+BACKEND_URL_DEV=https://ewzlv276yh.execute-api.us-east-1.amazonaws.com/dev
+FRONTEND_URL_DEV=
+S3_BUCKET_NAME=jewelry-frontend-139984030807-staging 
 CLOUDFRONT_DISTRIBUTION_ID=E1A2B3C4D5E6F7
 
 # Staging
-AWS_ROLE_ARN_STAGE=arn:aws:iam::123456789012:role/GitHubActions-Stage
-BACKEND_URL_STAGE=https://api-stage.jewelry-mfg.com
-FRONTEND_URL_STAGE=https://stage.jewelry-mfg.com
+AWS_ROLE_ARN_STAGE=arn:aws:iam::123456789012:role/arn:aws:iam::139984030807:role/github-actions-stage
+BACKEND_URL_STAGE=https://ewzlv276yh.execute-api.us-east-1.amazonaws.com/Stage
+FRONTEND_URL_STAGE=
 
 # Production
-AWS_ROLE_ARN_PROD=arn:aws:iam::123456789012:role/GitHubActions-Prod
-BACKEND_URL_PROD=https://api.jewelry-mfg.com
-FRONTEND_URL_PROD=https://jewelry-mfg.com
+AWS_ROLE_ARN_PROD=arn:aws:iam::139984030807:role/github-actions-prod
+BACKEND_URL_PROD=https://ewzlv276yh.execute-api.us-east-1.amazonaws.com/Prod
+FRONTEND_URL_PROD=
 ```
 
 ## Security Notes

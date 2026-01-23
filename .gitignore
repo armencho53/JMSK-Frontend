@@ -33,5 +33,3 @@ samconfig.toml.bak
 *.md
 !README.md
 
-.gitignore
-
