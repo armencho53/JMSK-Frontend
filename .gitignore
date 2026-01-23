@@ -28,3 +28,10 @@ dist-ssr
 # SAM build artifacts
 .aws-sam/
 samconfig.toml.bak
+
+# All .md files except README.md
+*.md
+!README.md
+
+.gitignore
+
