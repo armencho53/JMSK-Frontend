@@ -210,6 +210,12 @@ jobs:
             --include "*.html" \
             --cache-control "public, max-age=0, must-revalidate"
 
+      - name: Configure S3 for SPA routing
+        run: |
+          aws s3 website s3://${{ vars.S3_BUCKET_NAME }}-${{ needs.determine-environment.outputs.environment }}/ \
+            --index-document index.html \
+            --error-document index.html
+
       - name: Invalidate CloudFront cache
         if: vars.CLOUDFRONT_DISTRIBUTION_ID != ''
         run: |

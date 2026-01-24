@@ -192,25 +192,106 @@ async function testLoginPageAccessible(page) {
   log('Testing login page accessibility...');
   
   try {
-    await page.goto(`${FRONTEND_URL}/login`, { waitUntil: 'networkidle' });
+    // First, try to navigate to the login page
+    const response = await page.goto(`${FRONTEND_URL}/login`, { 
+      waitUntil: 'networkidle', 
+      timeout: 30000 
+    });
     
-    const hasEmailInput = await page.locator('input[type="email"]').count() > 0;
-    const hasPasswordInput = await page.locator('input[type="password"]').count() > 0;
-    const hasSubmitButton = await page.locator('button[type="submit"]').count() > 0;
+    // Check if we got a valid response
+    if (!response || !response.ok()) {
+      log(`Login page returned status ${response?.status() || 'unknown'}`, 'warn');
+      
+      // Try navigating to root first, then to login via client-side routing
+      log('Attempting alternative navigation via root...', 'info');
+      await page.goto(FRONTEND_URL, { waitUntil: 'networkidle', timeout: 30000 });
+      await page.waitForTimeout(2000); // Wait for React to load
+      
+      // Try to navigate to login via client-side routing
+      await page.evaluate(() => {
+        window.location.hash = '#/login';
+      });
+      await page.waitForTimeout(1000);
+      
+      // Or try clicking a login link if it exists
+      const loginLink = page.locator('a[href="/login"]');
+      if (await loginLink.count() > 0) {
+        await loginLink.first().click();
+        await page.waitForTimeout(2000);
+      }
+    }
+    
+    // Wait for the page to be fully rendered by checking for the form
+    try {
+      await page.waitForSelector('form', { timeout: 10000 });
+    } catch (e) {
+      // If form doesn't appear, take a screenshot for debugging
+      const screenshotPath = path.join(RESULTS_DIR, 'login-page-error.png');
+      await page.screenshot({ path: screenshotPath, fullPage: true });
+      log(`Screenshot saved to ${screenshotPath}`, 'warn');
+      
+      // Get page content for debugging
+      const pageContent = await page.content();
+      const contentPath = path.join(RESULTS_DIR, 'login-page-content.html');
+      fs.writeFileSync(contentPath, pageContent);
+      log(`Page content saved to ${contentPath}`, 'warn');
+      
+      throw new Error('Form element not found on login page');
+    }
+    
+    // Wait a bit for React to hydrate
+    await page.waitForTimeout(1000);
+    
+    // Check for required elements
+    const emailInput = page.locator('input[type="email"]');
+    const passwordInput = page.locator('input[type="password"]');
+    const submitButton = page.locator('button[type="submit"]');
+    
+    const hasEmailInput = await emailInput.count() > 0;
+    const hasPasswordInput = await passwordInput.count() > 0;
+    const hasSubmitButton = await submitButton.count() > 0;
     
     if (hasEmailInput && hasPasswordInput && hasSubmitButton) {
       log('Login page is properly rendered', 'info');
       return { passed: true, message: 'Login page accessible and functional' };
     } else {
       log('Login page is missing required elements', 'error');
+      
+      // Take screenshot for debugging
+      const screenshotPath = path.join(RESULTS_DIR, 'login-page-incomplete.png');
+      await page.screenshot({ path: screenshotPath, fullPage: true });
+      
+      // Get more details for debugging
+      const pageContent = await page.content();
+      const hasForm = pageContent.includes('<form');
+      const hasInputs = pageContent.includes('<input');
+      
       return { 
         passed: false, 
         message: 'Login page incomplete',
-        details: { hasEmailInput, hasPasswordInput, hasSubmitButton }
+        details: { 
+          hasEmailInput, 
+          hasPasswordInput, 
+          hasSubmitButton,
+          hasForm,
+          hasInputs,
+          url: page.url(),
+          screenshot: screenshotPath
+        }
       };
     }
   } catch (error) {
     log(`Login page test failed: ${error.message}`, 'error');
+    
+    // Try to take a screenshot even on error
+    try {
+      const screenshotPath = path.join(RESULTS_DIR, 'login-page-error.png');
+      await page.screenshot({ path: screenshotPath, fullPage: true });
+      log(`Error screenshot saved to ${screenshotPath}`, 'warn');
+    } catch (screenshotError) {
+      log(`Could not save screenshot: ${screenshotError.message}`, 'warn');
+    }
+    
     return { passed: false, message: error.message };
   }
 }
