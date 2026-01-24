@@ -85,8 +85,8 @@ async function testAPIConfiguration(page) {
     // Check if API URL is correctly configured
     const apiUrl = await page.evaluate(() => {
       return window.localStorage.getItem('apiUrl') || 
-             (window as any).VITE_API_URL || 
-             import.meta.env.VITE_API_URL;
+             window.VITE_API_URL || 
+             (typeof import !== 'undefined' && import.meta && import.meta.env && import.meta.env.VITE_API_URL);
     });
     
     if (apiUrl && apiUrl.includes(BACKEND_URL.replace(/^https?:\/\//, ''))) {
