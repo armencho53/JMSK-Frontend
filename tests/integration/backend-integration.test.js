@@ -84,9 +84,8 @@ async function testAPIConfiguration(page) {
     
     // Check if API URL is correctly configured
     const apiUrl = await page.evaluate(() => {
-      return window.localStorage.getItem('apiUrl') || 
-             window.VITE_API_URL || 
-             (typeof import !== 'undefined' && import.meta && import.meta.env && import.meta.env.VITE_API_URL);
+      // Check localStorage first, then window object
+      return window.localStorage.getItem('apiUrl') || window.VITE_API_URL || '';
     });
     
     if (apiUrl && apiUrl.includes(BACKEND_URL.replace(/^https?:\/\//, ''))) {
@@ -115,10 +114,9 @@ async function testLoginEndpoint(page) {
     
     // Intercept API call
     const [response] = await Promise.all([
-      page.waitForResponse(response => 
-        response.url().includes('/auth/login') || response.url().includes('/login'),
-        { timeout: 10000 }
-      ),
+      page.waitForResponse(response => {
+        return response.url().includes('/auth/login') || response.url().includes('/login');
+      }, { timeout: 10000 }),
       page.click('button[type="submit"]')
     ]);
     
