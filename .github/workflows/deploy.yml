@@ -85,6 +85,15 @@ jobs:
           echo "Environment: ${{ needs.determine-environment.outputs.environment }}"
           echo "AWS Role: ${{ needs.determine-environment.outputs.aws-role }}"
           echo "Backend URL: ${{ needs.determine-environment.outputs.backend-url }}"
+      
+      - name: Test secret directly
+        run: |
+          echo "Direct secret test: ${{ secrets.AWS_ROLE_ARN_DEV }}"
+          if [ -z "${{ secrets.AWS_ROLE_ARN_DEV }}" ]; then
+            echo "SECRET IS EMPTY OR UNDEFINED"
+          else
+            echo "SECRET HAS A VALUE"
+          fi
 
   build:
     runs-on: ubuntu-latest
