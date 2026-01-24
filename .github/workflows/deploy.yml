@@ -37,8 +37,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       environment: ${{ steps.set-env.outputs.environment }}
-      aws-role: ${{ steps.set-env.outputs.aws-role }}
-      backend-url: ${{ steps.set-env.outputs.backend-url }}
+      aws-role: ${{ steps.set-prod.outputs.aws-role || steps.set-stage.outputs.aws-role || steps.set-dev.outputs.aws-role }}
+      backend-url: ${{ steps.set-prod.outputs.backend-url || steps.set-stage.outputs.backend-url || steps.set-dev.outputs.backend-url }}
     steps:
       - name: Determine environment
         id: set-env
@@ -54,21 +54,27 @@ jobs:
           fi
           
           echo "environment=$ENV" >> $GITHUB_OUTPUT
-          
-          case $ENV in
-            production)
-              echo "aws-role=${{ secrets.AWS_ROLE_ARN_PROD }}" >> $GITHUB_OUTPUT
-              echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL_PROD }}" >> $GITHUB_OUTPUT
-              ;;
-            staging)
-              echo "aws-role=${{ secrets.AWS_ROLE_ARN_STAGE }}" >> $GITHUB_OUTPUT
-              echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL_STAGE }}" >> $GITHUB_OUTPUT
-              ;;
-            *)
-              echo "aws-role=${{ secrets.AWS_ROLE_ARN_DEV }}" >> $GITHUB_OUTPUT     
-              echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL_DEV }}" >> $GITHUB_OUTPUT         
-              ;;
-          esac
+      
+      - name: Set production outputs
+        if: steps.set-env.outputs.environment == 'production'
+        id: set-prod
+        run: |
+          echo "aws-role=${{ secrets.AWS_ROLE_ARN_PROD }}" >> $GITHUB_OUTPUT
+          echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL_PROD }}" >> $GITHUB_OUTPUT
+      
+      - name: Set staging outputs
+        if: steps.set-env.outputs.environment == 'staging'
+        id: set-stage
+        run: |
+          echo "aws-role=${{ secrets.AWS_ROLE_ARN_STAGE }}" >> $GITHUB_OUTPUT
+          echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL_STAGE }}" >> $GITHUB_OUTPUT
+      
+      - name: Set development outputs
+        if: steps.set-env.outputs.environment == 'development'
+        id: set-dev
+        run: |
+          echo "aws-role=${{ secrets.AWS_ROLE_ARN_DEV }}" >> $GITHUB_OUTPUT
+          echo "backend-url=${{ vars.BACKEND_URL_DEV }}" >> $GITHUB_OUTPUT
 
   debug-outputs:
     runs-on: ubuntu-latest
