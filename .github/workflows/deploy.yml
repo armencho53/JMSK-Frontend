@@ -70,6 +70,16 @@ jobs:
               ;;
           esac
 
+  debug-outputs:
+    runs-on: ubuntu-latest
+    needs: determine-environment
+    steps:
+      - name: Debug outputs
+        run: |
+          echo "Environment: ${{ needs.determine-environment.outputs.environment }}"
+          echo "AWS Role: ${{ needs.determine-environment.outputs.aws-role }}"
+          echo "Backend URL: ${{ needs.determine-environment.outputs.backend-url }}"
+
   build:
     runs-on: ubuntu-latest
     needs: determine-environment
