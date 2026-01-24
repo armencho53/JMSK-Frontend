@@ -39,6 +39,7 @@ jobs:
       environment: ${{ steps.set-env.outputs.environment }}
       aws-role: ${{ steps.set-env.outputs.aws-role }}
       backend-url: ${{ steps.set-env.outputs.backend-url }}
+      frontend-url: ${{ steps.set-env.outputs.frontend-url }}
     steps:
       - name: Determine environment
         id: set-env
@@ -59,14 +60,17 @@ jobs:
             production)
               echo "aws-role=${{ vars.AWS_ROLE_ARN_PROD }}" >> $GITHUB_OUTPUT
               echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL_PROD }}" >> $GITHUB_OUTPUT
+              echo "frontend-url=${{ vars.FRONTEND_URL_PROD }}" >> $GITHUB_OUTPUT
               ;;
             staging)
               echo "aws-role=${{ vars.AWS_ROLE_ARN_STAGE }}" >> $GITHUB_OUTPUT
               echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL_STAGE }}" >> $GITHUB_OUTPUT
+              echo "frontend-url=${{ vars.FRONTEND_URL_STAGE }}" >> $GITHUB_OUTPUT
               ;;
             *)
               echo "aws-role=${{ vars.AWS_ROLE_ARN_DEV }}" >> $GITHUB_OUTPUT
               echo "backend-url=${{ vars.BACKEND_URL_DEV }}" >> $GITHUB_OUTPUT
+              echo "frontend-url=${{ vars.FRONTEND_URL_DEV }}" >> $GITHUB_OUTPUT
               ;;
           esac
 
@@ -218,6 +222,7 @@ jobs:
           echo "## Deployment Summary :rocket:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Environment**: ${{ needs.determine-environment.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Frontend URL**: ${{ needs.determine-environment.outputs.frontend-url }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Backend URL**: ${{ needs.determine-environment.outputs.backend-url }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
@@ -244,7 +249,7 @@ jobs:
       - name: Run smoke tests
         env:
           BACKEND_URL: ${{ needs.determine-environment.outputs.backend-url }}
-          FRONTEND_URL: ${{ vars.FRONTEND_URL }}-${{ needs.determine-environment.outputs.environment }}
+          FRONTEND_URL: ${{ needs.determine-environment.outputs.frontend-url }}
         run: |
           npx playwright install --with-deps chromium
           node tests/smoke/post-deployment.test.js
