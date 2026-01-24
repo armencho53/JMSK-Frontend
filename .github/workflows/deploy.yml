@@ -42,13 +42,6 @@ jobs:
     steps:
       - name: Determine environment
         id: set-env
-        env:
-          AWS_ROLE_DEV: ${{ secrets.AWS_ROLE_ARN_DEV }}
-          AWS_ROLE_STAGE: ${{ secrets.AWS_ROLE_ARN_STAGE }}
-          AWS_ROLE_PROD: ${{ secrets.AWS_ROLE_ARN_PROD }}
-          BACKEND_DEV: ${{ vars.BACKEND_URL_DEV }}
-          BACKEND_STAGE: ${{ vars.BACKEND_URL_STAGE }}
-          BACKEND_PROD: ${{ vars.BACKEND_URL_PROD }}
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             ENV="${{ github.event.inputs.environment }}"
@@ -64,16 +57,16 @@ jobs:
           
           case $ENV in
             production)
-              echo "aws-role=$AWS_ROLE_PROD" >> $GITHUB_OUTPUT
+              echo "aws-role=${{ vars.AWS_ROLE_ARN_PROD }}" >> $GITHUB_OUTPUT
               echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL_PROD }}" >> $GITHUB_OUTPUT
               ;;
             staging)
-              echo "aws-role=$AWS_ROLE_STAGE" >> $GITHUB_OUTPUT
+              echo "aws-role=${{ vars.AWS_ROLE_ARN_STAGE }}" >> $GITHUB_OUTPUT
               echo "backend-url=${{ github.event.inputs.backend_url || vars.BACKEND_URL_STAGE }}" >> $GITHUB_OUTPUT
               ;;
             *)
-              echo "aws-role=$AWS_ROLE_DEV" >> $GITHUB_OUTPUT
-              echo "backend-url=$BACKEND_DEV" >> $GITHUB_OUTPUT
+              echo "aws-role=${{ vars.AWS_ROLE_ARN_DEV }}" >> $GITHUB_OUTPUT
+              echo "backend-url=${{ vars.BACKEND_URL_DEV }}" >> $GITHUB_OUTPUT
               ;;
           esac
 
