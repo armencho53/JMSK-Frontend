@@ -21,7 +21,8 @@ export default function Login() {
     setError('')
     setLoading(true)
 
-    console.log('Login attempt:', { email, password: '***', rememberMe }) // Debug log
+    console.log('Login attempt:', { email, password: '***', rememberMe })
+    console.log('API Base URL:', api.defaults.baseURL)
 
     try {
       // Send email, password, and remember_me as form data
@@ -30,7 +31,8 @@ export default function Login() {
       formData.append('password', password)
       formData.append('remember_me', rememberMe.toString())
 
-      console.log('Sending login request...') // Debug log
+      console.log('Sending login request to:', `${api.defaults.baseURL}/auth/login`)
+      console.log('Form data:', formData.toString())
 
       const { data } = await api.post('/auth/login', formData, {
         headers: {
@@ -38,7 +40,10 @@ export default function Login() {
         },
       })
 
-      console.log('Login successful, tokens received') // Debug log
+      console.log('Login successful, tokens received:', { 
+        hasAccessToken: !!data.access_token,
+        hasRefreshToken: !!data.refresh_token 
+      })
 
       // Set tokens first so they're available for the next request
       setAuth(data.access_token, data.refresh_token, null as any)
@@ -52,7 +57,13 @@ export default function Login() {
       setAuth(data.access_token, data.refresh_token, user)
       navigate('/')
     } catch (err: any) {
-      console.error('Login error:', err.response?.data)
+      console.error('Login error details:', {
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        headers: err.response?.headers,
+        message: err.message
+      })
       
       // Handle different error formats
       let errorMessage = 'Login failed'
