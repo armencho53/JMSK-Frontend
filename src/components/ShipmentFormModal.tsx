@@ -43,11 +43,11 @@ interface ShipmentFormData {
 }
 
 const statusOptions = [
-  { value: 'preparing', label: 'Preparing' },
-  { value: 'shipped', label: 'Shipped' },
-  { value: 'in_transit', label: 'In Transit' },
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'returned', label: 'Returned' },
+  { value: 'PREPARING', label: 'Preparing' },
+  { value: 'SHIPPED', label: 'Shipped' },
+  { value: 'IN_TRANSIT', label: 'In Transit' },
+  { value: 'DELIVERED', label: 'Delivered' },
+  { value: 'RETURNED', label: 'Returned' },
 ]
 
 export default function ShipmentFormModal({
@@ -351,7 +351,7 @@ export default function ShipmentFormModal({
                     </label>
                     <select
                       id="status"
-                      value={formData.status || 'preparing'}
+                      value={formData.status || 'PREPARING'}
                       onChange={(e) =>
                         setFormData({ ...formData, status: e.target.value })
                       }

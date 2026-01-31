@@ -75,20 +75,20 @@ interface ManufacturingFormData {
 }
 
 const stepTypeOptions = [
-  { value: 'design', label: 'Design' },
-  { value: 'casting', label: 'Casting' },
-  { value: 'stone_setting', label: 'Stone Setting' },
-  { value: 'polishing', label: 'Polishing' },
-  { value: 'engraving', label: 'Engraving' },
-  { value: 'quality_check', label: 'Quality Check' },
-  { value: 'finishing', label: 'Finishing' },
-  { value: 'other', label: 'Other' },
+  { value: 'DESIGN', label: 'Design' },
+  { value: 'CASTING', label: 'Casting' },
+  { value: 'STONE_SETTING', label: 'Stone Setting' },
+  { value: 'POLISHING', label: 'Polishing' },
+  { value: 'ENGRAVING', label: 'Engraving' },
+  { value: 'QUALITY_CHECK', label: 'Quality Check' },
+  { value: 'FINISHING', label: 'Finishing' },
+  { value: 'OTHER', label: 'Other' },
 ]
 
 const statusOptions = [
-  { value: 'in_progress', label: 'In Progress' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'failed', label: 'Failed' },
+  { value: 'IN_PROGRESS', label: 'In Progress' },
+  { value: 'COMPLETED', label: 'Completed' },
+  { value: 'FAILED', label: 'Failed' },
 ]
 
 export default function ManufacturingFormModal({
@@ -602,7 +602,7 @@ export default function ManufacturingFormModal({
                   </label>
                   <select
                     id="status"
-                    value={formData.status || 'in_progress'}
+                    value={formData.status || 'IN_PROGRESS'}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   >

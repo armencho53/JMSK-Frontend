@@ -24,11 +24,11 @@ interface Shipment {
 }
 
 const statusColors: Record<string, string> = {
-  preparing: 'bg-yellow-100 text-yellow-800',
-  shipped: 'bg-blue-100 text-blue-800',
-  in_transit: 'bg-indigo-100 text-indigo-800',
-  delivered: 'bg-green-100 text-green-800',
-  returned: 'bg-red-100 text-red-800',
+  PREPARING: 'bg-yellow-100 text-yellow-800',
+  SHIPPED: 'bg-blue-100 text-blue-800',
+  IN_TRANSIT: 'bg-indigo-100 text-indigo-800',
+  DELIVERED: 'bg-green-100 text-green-800',
+  RETURNED: 'bg-red-100 text-red-800',
 }
 
 export default function Shipments() {

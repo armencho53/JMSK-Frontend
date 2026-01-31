@@ -47,22 +47,22 @@ interface OrderFormData {
 }
 
 const statusOptions = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'in_progress', label: 'In Progress' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'shipped', label: 'Shipped' },
-  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'PENDING', label: 'Pending' },
+  { value: 'IN_PROGRESS', label: 'In Progress' },
+  { value: 'COMPLETED', label: 'Completed' },
+  { value: 'SHIPPED', label: 'Shipped' },
+  { value: 'CANCELLED', label: 'Cancelled' },
 ]
 
 const metalTypeOptions = [
   { value: '', label: 'Select metal type' },
-  { value: 'gold_24k', label: 'Gold 24K' },
-  { value: 'gold_22k', label: 'Gold 22K' },
-  { value: 'gold_18k', label: 'Gold 18K' },
-  { value: 'gold_14k', label: 'Gold 14K' },
-  { value: 'silver_925', label: 'Silver 925' },
-  { value: 'platinum', label: 'Platinum' },
-  { value: 'other', label: 'Other' },
+  { value: 'GOLD_24K', label: 'Gold 24K' },
+  { value: 'GOLD_22K', label: 'Gold 22K' },
+  { value: 'GOLD_18K', label: 'Gold 18K' },
+  { value: 'GOLD_14K', label: 'Gold 14K' },
+  { value: 'SILVER_925', label: 'Silver 925' },
+  { value: 'PLATINUM', label: 'Platinum' },
+  { value: 'OTHER', label: 'Other' },
 ]
 
 export default function OrderFormModal({
@@ -474,7 +474,7 @@ export default function OrderFormModal({
                     </label>
                     <select
                       id="status"
-                      value={formData.status || 'pending'}
+                      value={formData.status || 'PENDING'}
                       onChange={(e) =>
                         setFormData({ ...formData, status: e.target.value })
                       }

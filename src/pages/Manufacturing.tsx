@@ -60,9 +60,9 @@ interface ManufacturingFormData {
 }
 
 const statusColors: Record<string, string> = {
-  in_progress: 'bg-blue-100 text-blue-800',
-  completed: 'bg-green-100 text-green-800',
-  failed: 'bg-red-100 text-red-800',
+  IN_PROGRESS: 'bg-blue-100 text-blue-800',
+  COMPLETED: 'bg-green-100 text-green-800',
+  FAILED: 'bg-red-100 text-red-800',
 }
 
 export default function Manufacturing() {
@@ -263,7 +263,7 @@ export default function Manufacturing() {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColors[step.status] || 'bg-gray-100 text-gray-800'}`}>
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full uppercase ${statusColors[step.status] || 'bg-gray-100 text-gray-800'}`}>
                         {step.status.replace(/_/g, ' ')}
                       </span>
                     </td>
@@ -287,7 +287,7 @@ export default function Manufacturing() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
                       </button>
-                      {step.status === 'in_progress' && (
+                      {step.status === 'IN_PROGRESS' && (
                         <button
                           onClick={() => handleTransferClick(step)}
                           className="text-purple-600 hover:text-purple-900"
