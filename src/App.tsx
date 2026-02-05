@@ -7,7 +7,10 @@ import Dashboard from './pages/Dashboard'
 import Supplies from './pages/Supplies'
 import Customers from './pages/Customers'
 import CustomerDetail from './pages/CustomerDetail'
+import Contacts from './pages/Contacts'
+import ContactDetail from './pages/ContactDetail'
 import Companies from './pages/Companies'
+import CompanyDetail from './pages/CompanyDetail'
 import Orders from './pages/Orders'
 import Manufacturing from './pages/Manufacturing'
 import Shipments from './pages/Shipments'
@@ -58,7 +61,10 @@ function App() {
               <Route path="supplies" element={<Supplies />} />
               <Route path="customers" element={<Customers />} />
               <Route path="customers/:customerId" element={<CustomerDetail />} />
+              <Route path="contacts" element={<Contacts />} />
+              <Route path="contacts/:contactId" element={<ContactDetail />} />
               <Route path="companies" element={<Companies />} />
+              <Route path="companies/:companyId" element={<CompanyDetail />} />
               <Route path="orders" element={<Orders />} />
               <Route path="manufacturing" element={<Manufacturing />} />
               <Route path="departments" element={<Departments />} />

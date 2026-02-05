@@ -23,7 +23,7 @@ interface NavigationItem {
 const navigationItems: NavigationItem[] = [
   { name: 'Dashboard', href: '/', icon: HomeIcon },
   { name: 'Supplies', href: '/supplies', icon: CubeIcon },
-  { name: 'Customers', href: '/customers', icon: UserGroupIcon },
+  { name: 'Contacts', href: '/contacts', icon: UserGroupIcon },
   { name: 'Companies', href: '/companies', icon: BuildingOfficeIcon },
   { name: 'Orders', href: '/orders', icon: ClipboardDocumentListIcon },
   { name: 'Manufacturing', href: '/manufacturing', icon: CogIcon },

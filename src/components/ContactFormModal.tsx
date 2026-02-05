@@ -1,48 +1,59 @@
 import { useEffect, useState } from 'react'
-import { Company } from '../types/company'
+import { useQuery } from '@tanstack/react-query'
+import { fetchCompanies } from '../lib/api'
+import { Contact } from '../types/contact'
 
-interface CompanyFormModalProps {
+interface ContactFormModalProps {
   isOpen: boolean
   onClose: () => void
   mode: 'create' | 'edit'
-  company?: Company | null
+  contact?: Contact | null
   onSubmit: (data: any) => void
   isSubmitting: boolean
 }
 
-export default function CompanyFormModal({
+export default function ContactFormModal({
   isOpen,
   onClose,
   mode,
-  company,
+  contact,
   onSubmit,
   isSubmitting,
-}: CompanyFormModalProps) {
+}: ContactFormModalProps) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
+    company_id: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  const { data: companies } = useQuery({
+    queryKey: ['companies'],
+    queryFn: () => fetchCompanies(),
+    enabled: isOpen
+  })
+
   useEffect(() => {
     if (isOpen) {
-      if (mode === 'edit' && company) {
+      if (mode === 'edit' && contact) {
         setFormData({
-          name: company.name,
-          email: company.email || '',
-          phone: company.phone || '',
+          name: contact.name,
+          email: contact.email || '',
+          phone: contact.phone || '',
+          company_id: contact.company_id?.toString() || '',
         })
       } else {
         setFormData({
           name: '',
           email: '',
           phone: '',
+          company_id: '',
         })
       }
       setErrors({})
     }
-  }, [isOpen, mode, company])
+  }, [isOpen, mode, contact])
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -60,6 +71,10 @@ export default function CompanyFormModal({
 
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required'
+    }
+
+    if (!formData.company_id) {
+      newErrors.company_id = 'Company is required'
     }
 
     if (formData.email && formData.email.trim()) {
@@ -82,6 +97,7 @@ export default function CompanyFormModal({
 
     const submitData: any = {
       name: formData.name.trim(),
+      company_id: parseInt(formData.company_id),
       email: formData.email.trim() || undefined,
       phone: formData.phone.trim() || undefined,
     }
@@ -142,20 +158,20 @@ export default function CompanyFormModal({
                 className="text-lg leading-6 font-medium text-gray-900 mb-4"
                 id="modal-title"
               >
-                {mode === 'create' ? 'Create Company' : 'Edit Company'}
+                {mode === 'create' ? 'Create Contact' : 'Edit Contact'}
               </h3>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label
-                    htmlFor="company-name"
+                    htmlFor="contact-name"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    id="company-name"
+                    id="contact-name"
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
@@ -163,7 +179,7 @@ export default function CompanyFormModal({
                     className={`mt-1 block w-full border ${
                       errors.name ? 'border-red-300' : 'border-gray-300'
                     } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                    placeholder="Acme Corporation"
+                    placeholder="John Doe"
                   />
                   {errors.name && (
                     <p className="mt-1 text-sm text-red-600">{errors.name}</p>
@@ -172,14 +188,43 @@ export default function CompanyFormModal({
 
                 <div>
                   <label
-                    htmlFor="company-email"
+                    htmlFor="contact-company"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Company <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="contact-company"
+                    value={formData.company_id}
+                    onChange={(e) =>
+                      setFormData({ ...formData, company_id: e.target.value })
+                    }
+                    className={`mt-1 block w-full border ${
+                      errors.company_id ? 'border-red-300' : 'border-gray-300'
+                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                  >
+                    <option value="">Select a company</option>
+                    {companies?.map((company) => (
+                      <option key={company.id} value={company.id}>
+                        {company.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.company_id && (
+                    <p className="mt-1 text-sm text-red-600">{errors.company_id}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="contact-email"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Email
                   </label>
                   <input
                     type="email"
-                    id="company-email"
+                    id="contact-email"
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
@@ -187,7 +232,7 @@ export default function CompanyFormModal({
                     className={`mt-1 block w-full border ${
                       errors.email ? 'border-red-300' : 'border-gray-300'
                     } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                    placeholder="info@acme.com"
+                    placeholder="john@example.com"
                   />
                   {errors.email && (
                     <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -196,14 +241,14 @@ export default function CompanyFormModal({
 
                 <div>
                   <label
-                    htmlFor="company-phone"
+                    htmlFor="contact-phone"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Phone
                   </label>
                   <input
                     type="tel"
-                    id="company-phone"
+                    id="contact-phone"
                     value={formData.phone}
                     onChange={(e) =>
                       setFormData({ ...formData, phone: e.target.value })
@@ -243,9 +288,9 @@ export default function CompanyFormModal({
                         {mode === 'create' ? 'Creating...' : 'Updating...'}
                       </>
                     ) : mode === 'create' ? (
-                      'Create Company'
+                      'Create Contact'
                     ) : (
-                      'Update Company'
+                      'Update Contact'
                     )}
                   </button>
                   <button
