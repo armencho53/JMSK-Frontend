@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { fetchContacts, createContact, updateContact, deleteContact } from '../lib/api'
@@ -94,6 +94,11 @@ export default function Contacts() {
 
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+
+  // Set document title (Requirement 7.1)
+  useEffect(() => {
+    document.title = 'Contacts - JMSK'
+  }, [])
 
   const { data: contacts, isLoading, error } = useQuery({
     queryKey: ['contacts', searchQuery],

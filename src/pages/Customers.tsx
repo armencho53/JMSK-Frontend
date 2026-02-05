@@ -13,8 +13,8 @@ import { Table, TableColumn } from '../components/ui/Table'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 
-// Define table columns for customers
-const getCustomerColumns = (
+// Define table columns for contacts
+const getContactColumns = (
   onEdit: (customer: Customer) => void,
   onDelete: (customer: Customer) => void
 ): TableColumn<Customer>[] => [
@@ -68,7 +68,7 @@ const getCustomerColumns = (
             onEdit(record);
           }}
           className="text-indigo-600 hover:text-slate-900"
-          title="Edit customer"
+          title="Edit contact"
         >
           Edit
         </button>
@@ -78,7 +78,7 @@ const getCustomerColumns = (
             onDelete(record);
           }}
           className="text-red-600 hover:text-red-900"
-          title="Delete customer"
+          title="Delete contact"
         >
           Delete
         </button>
@@ -119,11 +119,11 @@ export default function Customers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] })
-      showSuccessToast('Customer created successfully')
+      showSuccessToast('Contact created successfully')
       setIsCreateModalOpen(false)
     },
     onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Failed to create customer'
+      const message = error.response?.data?.detail || 'Failed to create contact'
       showErrorToast(message)
     }
   })
@@ -143,12 +143,12 @@ export default function Customers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] })
-      showSuccessToast('Customer updated successfully')
+      showSuccessToast('Contact updated successfully')
       setIsEditModalOpen(false)
       setCustomerToEdit(null)
     },
     onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Failed to update customer'
+      const message = error.response?.data?.detail || 'Failed to update contact'
       showErrorToast(message)
     }
   })
@@ -160,12 +160,12 @@ export default function Customers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] })
-      showSuccessToast('Customer deleted successfully')
+      showSuccessToast('Contact deleted successfully')
       setIsDeleteModalOpen(false)
       setCustomerToDelete(null)
     },
     onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Failed to delete customer'
+      const message = error.response?.data?.detail || 'Failed to delete contact'
       showErrorToast(message)
     }
   })
@@ -214,7 +214,7 @@ export default function Customers() {
   }
 
   // Define table columns
-  const columns = getCustomerColumns(handleEditClick, handleDeleteClick);
+  const columns = getContactColumns(handleEditClick, handleDeleteClick);
 
   if (isLoading) {
     return (
@@ -222,7 +222,7 @@ export default function Customers() {
         <Card variant="default">
           <CardContent className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
-            <p className="mt-2 text-slate-600">Loading customers...</p>
+            <p className="mt-2 text-slate-600">Loading contacts...</p>
           </CardContent>
         </Card>
       </Container>
@@ -234,7 +234,7 @@ export default function Customers() {
       <Container size="full" padding="md">
         <Card variant="outlined" className="border-red-200 bg-red-50">
           <CardContent>
-            <p className="text-red-800">Error loading customers. Please try again.</p>
+            <p className="text-red-800">Error loading contacts. Please try again.</p>
           </CardContent>
         </Card>
       </Container>
@@ -246,12 +246,12 @@ export default function Customers() {
       <Toaster />
       
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-slate-900">Customers</h1>
+        <h1 className="text-2xl font-semibold text-slate-900">Contacts</h1>
         <Button 
           onClick={() => setIsCreateModalOpen(true)}
           variant="primary"
         > 
-          Create Customer
+          Create Contact
         </Button>
       </div>
 
@@ -272,7 +272,7 @@ export default function Customers() {
           loading={isLoading}
           hoverable
           responsive
-          emptyText="No customers found. Create your first customer to get started."
+          emptyText="No contacts found. Create your first contact to get started."
           onRow={(record) => ({
             onClick: () => handleRowClick(record.id),
             className: 'cursor-pointer'
@@ -307,7 +307,7 @@ export default function Customers() {
           setCustomerToDelete(null)
         }}
         itemName={customerToDelete?.name || ''}
-        itemType="Customer"
+        itemType="Contact"
         onConfirm={handleConfirmDelete}
         isDeleting={deleteCustomerMutation.isPending}
       />

@@ -1,3 +1,18 @@
+/**
+ * DEPRECATED: Legacy customer types.
+ * 
+ * These types are being replaced by Contact types as part of the
+ * hierarchical contact system migration. Use src/types/contact.ts for all new code.
+ * 
+ * Migration path: Customer -> Contact
+ * See: src/types/contact.ts
+ * 
+ * @deprecated Use Contact types from src/types/contact.ts instead
+ */
+
+/**
+ * @deprecated Use Contact from src/types/contact.ts instead
+ */
 export interface Customer {
   id: number
   tenant_id: number
@@ -10,6 +25,9 @@ export interface Customer {
   balance?: number
 }
 
+/**
+ * @deprecated Use Company from src/types/company.ts instead
+ */
 export interface Company {
   id: number
   tenant_id: number
@@ -49,12 +67,18 @@ export interface BalanceBreakdown {
   completed: number
 }
 
+/**
+ * @deprecated Use ContactResponse with order history instead
+ */
 export interface CustomerDetail extends Customer {
   orders: OrderSummary[]
   shipments: ShipmentSummary[]
   balance_breakdown?: BalanceBreakdown
 }
 
+/**
+ * @deprecated Use ContactSummary from src/types/contact.ts instead
+ */
 export interface CustomerSummary {
   id: number
   name: string
@@ -62,6 +86,9 @@ export interface CustomerSummary {
   phone?: string
 }
 
+/**
+ * @deprecated Use CompanyWithContacts from src/types/company.ts instead
+ */
 export interface CompanyDetail extends Company {
   customers: CustomerSummary[]
 }

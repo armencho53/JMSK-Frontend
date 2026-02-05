@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { fetchCompanies, createCompany, updateCompany, deleteCompany } from '../lib/api'
@@ -106,6 +106,11 @@ export default function Companies() {
 
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+
+  // Set document title (Requirement 7.1)
+  useEffect(() => {
+    document.title = 'Companies - JMSK'
+  }, [])
 
   const { data: companies, isLoading, error } = useQuery({
     queryKey: ['companies', searchQuery],

@@ -162,11 +162,11 @@ export default function CustomerDetail() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customer', customerId] })
-      showSuccessToast('Customer updated successfully')
+      showSuccessToast('Contact updated successfully')
       setIsEditModalOpen(false)
     },
     onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Failed to update customer'
+      const message = error.response?.data?.detail || 'Failed to update contact'
       showErrorToast(message)
     }
   })
@@ -177,11 +177,11 @@ export default function CustomerDetail() {
       return response.data
     },
     onSuccess: () => {
-      showSuccessToast('Customer deleted successfully')
+      showSuccessToast('Contact deleted successfully')
       navigate('/customers')
     },
     onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Failed to delete customer'
+      const message = error.response?.data?.detail || 'Failed to delete contact'
       showErrorToast(message)
       setIsDeleteModalOpen(false)
     }
@@ -197,7 +197,7 @@ export default function CustomerDetail() {
         <Card variant="default">
           <CardContent className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
-            <p className="mt-2 text-slate-600">Loading customer...</p>
+            <p className="mt-2 text-slate-600">Loading contact...</p>
           </CardContent>
         </Card>
       </Container>
@@ -209,7 +209,7 @@ export default function CustomerDetail() {
       <Container size="full" padding="md">
         <Card variant="outlined" className="border-red-200 bg-red-50">
           <CardContent>
-            <p className="text-red-800">Customer not found.</p>
+            <p className="text-red-800">Contact not found.</p>
           </CardContent>
         </Card>
       </Container>
@@ -226,7 +226,7 @@ export default function CustomerDetail() {
           onClick={() => navigate('/customers')}
           className="mb-4"
         >
-          ← Back to Customers
+          ← Back to Contacts
         </Button>
         
         <div className="flex justify-between items-start">
@@ -358,7 +358,7 @@ export default function CustomerDetail() {
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         itemName={customer.name}
-        itemType="Customer"
+        itemType="Contact"
         onConfirm={() => deleteCustomerMutation.mutate()}
         isDeleting={deleteCustomerMutation.isPending}
       />

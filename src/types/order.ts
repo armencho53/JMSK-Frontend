@@ -18,8 +18,8 @@ export interface Order {
   // New hierarchical fields
   contact_id: number
   company_id: number
-  contact?: ContactSummary
-  company?: CompanySummary
+  contact?: ContactSummary  // Nested contact data (Requirement 3.1, 7.3)
+  company?: CompanySummary  // Nested company data (Requirement 3.1, 7.3)
   
   // Legacy customer fields (for backward compatibility)
   customer_id: number  // Maps to contact_id

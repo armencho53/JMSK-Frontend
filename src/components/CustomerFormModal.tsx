@@ -164,20 +164,20 @@ export default function CustomerFormModal({
                 className="text-lg leading-6 font-medium text-gray-900 mb-4"
                 id="modal-title"
               >
-                {mode === 'create' ? 'Create Customer' : 'Edit Customer'}
+                {mode === 'create' ? 'Create Contact' : 'Edit Contact'}
               </h3>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label
-                    htmlFor="customer-name"
+                    htmlFor="contact-name"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    id="customer-name"
+                    id="contact-name"
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
@@ -194,14 +194,14 @@ export default function CustomerFormModal({
 
                 <div>
                   <label
-                    htmlFor="customer-email"
+                    htmlFor="contact-email"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Email <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
-                    id="customer-email"
+                    id="contact-email"
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
@@ -218,14 +218,14 @@ export default function CustomerFormModal({
 
                 <div>
                   <label
-                    htmlFor="customer-phone"
+                    htmlFor="contact-phone"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Phone
                   </label>
                   <input
                     type="tel"
-                    id="customer-phone"
+                    id="contact-phone"
                     value={formData.phone}
                     onChange={(e) =>
                       setFormData({ ...formData, phone: e.target.value })
@@ -237,13 +237,13 @@ export default function CustomerFormModal({
 
                 <div>
                   <label
-                    htmlFor="customer-company"
+                    htmlFor="contact-company"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Company
                   </label>
                   <select
-                    id="customer-company"
+                    id="contact-company"
                     value={formData.company_id}
                     onChange={(e) =>
                       setFormData({ ...formData, company_id: e.target.value })
@@ -289,9 +289,9 @@ export default function CustomerFormModal({
                         {mode === 'create' ? 'Creating...' : 'Updating...'}
                       </>
                     ) : mode === 'create' ? (
-                      'Create Customer'
+                      'Create Contact'
                     ) : (
-                      'Update Customer'
+                      'Update Contact'
                     )}
                   </button>
                   <button

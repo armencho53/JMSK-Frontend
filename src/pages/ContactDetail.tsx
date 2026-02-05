@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { fetchContactById, fetchContactOrders, updateContact, deleteContact } from '../lib/api'
@@ -73,6 +73,13 @@ export default function ContactDetail() {
     queryFn: () => fetchContactOrders(Number(contactId)),
     enabled: !!contactId
   })
+
+  // Set document title (Requirement 7.1)
+  useEffect(() => {
+    if (contact) {
+      document.title = `${contact.name} - Contact Details - JMSK`
+    }
+  }, [contact])
 
   const updateContactMutation = useMutation({
     mutationFn: (data: ContactUpdate) => updateContact(Number(contactId), data),

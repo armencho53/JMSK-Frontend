@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import api from '../lib/api'
 import { showSuccessToast, showErrorToast } from '../lib/toast'
 import OrderFormModal from '../components/OrderFormModal'
@@ -15,6 +16,20 @@ import Modal from '../components/ui/Modal'
 interface Order {
   id: number
   order_number: string
+  contact_id?: number
+  company_id?: number
+  contact?: {
+    id: number
+    name: string
+    email?: string
+    phone?: string
+  }
+  company?: {
+    id: number
+    name: string
+    email?: string
+    phone?: string
+  }
   customer_id?: number
   customer_name: string
   customer_email?: string
@@ -46,9 +61,33 @@ const getOrderColumns = (
   },
   {
     key: 'customer_name',
-    title: 'Customer',
+    title: 'Contact',
     dataIndex: 'customer_name',
-    sortable: true
+    sortable: true,
+    render: (value: string, record: Order) => (
+      <div>
+        {/* Clickable contact name (Requirements 3.1, 7.3) */}
+        {record.contact_id && record.contact ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              window.location.href = `/contacts/${record.contact_id}`
+            }}
+            className="text-indigo-600 hover:text-indigo-800 hover:underline font-medium"
+          >
+            {record.contact.name}
+          </button>
+        ) : (
+          <span className="font-medium">{value}</span>
+        )}
+        {/* Show company name as secondary info */}
+        {record.company && (
+          <div className="text-xs text-slate-500 mt-0.5">
+            {record.company.name}
+          </div>
+        )}
+      </div>
+    )
   },
   {
     key: 'product_description',
@@ -146,7 +185,13 @@ export default function Orders() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
+
+  // Set document title (Requirement 7.1)
+  useEffect(() => {
+    document.title = 'Orders - JMSK'
+  }, [])
 
   const { data: orders, isLoading, error } = useQuery({
     queryKey: ['orders'],
@@ -348,8 +393,20 @@ export default function Orders() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-slate-600">Customer</p>
-                    <p className="text-sm text-slate-900 mt-1">{selectedOrder.customer_name}</p>
+                    <p className="text-xs font-medium text-slate-600">Contact</p>
+                    {selectedOrder.contact_id && selectedOrder.contact ? (
+                      <button
+                        onClick={() => navigate(`/contacts/${selectedOrder.contact_id}`)}
+                        className="text-sm text-indigo-600 hover:text-indigo-800 hover:underline mt-1 font-medium"
+                      >
+                        {selectedOrder.contact.name}
+                      </button>
+                    ) : (
+                      <p className="text-sm text-slate-900 mt-1">{selectedOrder.customer_name}</p>
+                    )}
+                    {selectedOrder.company && (
+                      <p className="text-xs text-slate-500 mt-0.5">{selectedOrder.company.name}</p>
+                    )}
                   </div>
                   <div>
                     <p className="text-xs font-medium text-slate-600">Product</p>

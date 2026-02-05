@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { 
@@ -7,11 +7,15 @@ import {
   fetchCompanyContacts, 
   fetchCompanyOrders, 
   fetchCompanyBalance,
+  fetchCompanyAddresses,
+  createAddress,
   updateCompany, 
   deleteCompany 
 } from '../lib/api'
 import { showSuccessToast, showErrorToast } from '../lib/toast'
 import CompanyFormModal from '../components/CompanyFormModal'
+import AddressFormModal from '../components/AddressFormModal'
+import AddressList from '../components/AddressList'
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal'
 import { CompanyUpdate } from '../types/company'
 import { Contact } from '../types/contact'
@@ -97,7 +101,8 @@ export default function CompanyDetail() {
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'contacts' | 'orders'>('contacts')
+  const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<'contacts' | 'orders' | 'addresses'>('contacts')
 
   const { data: company, isLoading: companyLoading } = useQuery({
     queryKey: ['company', companyId],
@@ -117,11 +122,24 @@ export default function CompanyDetail() {
     enabled: !!companyId && activeTab === 'orders'
   })
 
+  const { data: addresses } = useQuery({
+    queryKey: ['company-addresses', companyId],
+    queryFn: () => fetchCompanyAddresses(Number(companyId)),
+    enabled: !!companyId && activeTab === 'addresses'
+  })
+
   const { data: balance } = useQuery({
     queryKey: ['company-balance', companyId],
     queryFn: () => fetchCompanyBalance(Number(companyId)),
     enabled: !!companyId
   })
+
+  // Set document title (Requirement 7.1)
+  useEffect(() => {
+    if (company) {
+      document.title = `${company.name} - Company Details - JMSK`
+    }
+  }, [company])
 
   const updateCompanyMutation = useMutation({
     mutationFn: (data: CompanyUpdate) => updateCompany(Number(companyId), data),
@@ -146,6 +164,20 @@ export default function CompanyDetail() {
       const message = error.response?.data?.detail || 'Failed to delete company'
       showErrorToast(message)
       setIsDeleteModalOpen(false)
+    }
+  })
+
+  const createAddressMutation = useMutation({
+    mutationFn: (data: any) => createAddress(Number(companyId), data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['company-addresses', companyId] })
+      queryClient.invalidateQueries({ queryKey: ['company', companyId] })
+      showSuccessToast('Address added successfully')
+      setIsAddAddressModalOpen(false)
+    },
+    onError: (error: any) => {
+      const message = error.response?.data?.detail || 'Failed to add address'
+      showErrorToast(message)
     }
   })
 
@@ -256,6 +288,16 @@ export default function CompanyDetail() {
             >
               Orders
             </button>
+            <button
+              onClick={() => setActiveTab('addresses')}
+              className={`${
+                activeTab === 'addresses'
+                  ? 'border-indigo-500 text-indigo-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+            >
+              Addresses
+            </button>
           </nav>
         </div>
 
@@ -291,6 +333,23 @@ export default function CompanyDetail() {
               />
             </Card>
           )}
+
+          {activeTab === 'addresses' && (
+            <div>
+              <div className="mb-4 flex justify-end">
+                <Button
+                  variant="primary"
+                  onClick={() => setIsAddAddressModalOpen(true)}
+                >
+                  Add Address
+                </Button>
+              </div>
+              <AddressList 
+                addresses={addresses || []} 
+                companyId={Number(companyId)} 
+              />
+            </div>
+          )}
         </div>
       </div>
 
@@ -301,6 +360,15 @@ export default function CompanyDetail() {
         company={company}
         onSubmit={(data) => updateCompanyMutation.mutate(data)}
         isSubmitting={updateCompanyMutation.isPending}
+      />
+
+      <AddressFormModal
+        isOpen={isAddAddressModalOpen}
+        onClose={() => setIsAddAddressModalOpen(false)}
+        mode="create"
+        companyId={Number(companyId)}
+        onSubmit={(data) => createAddressMutation.mutate(data)}
+        isSubmitting={createAddressMutation.isPending}
       />
 
       <DeleteConfirmationModal
