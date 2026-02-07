@@ -1,18 +1,18 @@
 import React, { useState, useMemo } from 'react';
 
 // Table Types
-export interface TableColumn<T = any> {
+export interface TableColumn<T = Record<string, unknown>> {
   key: string;
   title: string;
   dataIndex?: keyof T;
-  render?: (value: any, record: T, index: number) => React.ReactNode;
+  render?: (value: unknown, record: T, index: number) => React.ReactNode;
   sortable?: boolean;
   width?: string | number;
   align?: 'left' | 'center' | 'right';
   responsive?: 'always' | 'desktop' | 'tablet';
 }
 
-export interface TableProps<T = any> {
+export interface TableProps<T = Record<string, unknown>> {
   columns: TableColumn<T>[];
   data: T[];
   loading?: boolean;
@@ -63,7 +63,7 @@ interface SortState {
 }
 
 // Table Component
-export function Table<T = any>({
+export function Table<T = Record<string, unknown>>({
   columns,
   data,
   loading = false,
@@ -86,7 +86,7 @@ export function Table<T = any>({
     if (typeof rowKey === 'function') {
       return rowKey(record);
     }
-    return (record as any)[rowKey] || index;
+    return (record as Record<string, unknown>)[rowKey] as string | number || index;
   };
 
   // Handle sorting
@@ -113,8 +113,8 @@ export function Table<T = any>({
     if (!column) return data;
 
     return [...data].sort((a, b) => {
-      const aValue = column.dataIndex ? (a as any)[column.dataIndex] : a;
-      const bValue = column.dataIndex ? (b as any)[column.dataIndex] : b;
+      const aValue = column.dataIndex ? (a as Record<string, unknown>)[column.dataIndex] : a;
+      const bValue = column.dataIndex ? (b as Record<string, unknown>)[column.dataIndex] : b;
 
       let comparison = 0;
       if (aValue < bValue) comparison = -1;
@@ -196,14 +196,14 @@ export function Table<T = any>({
   const renderCell = (column: TableColumn<T>, record: T, index: number) => {
     if (column.render) {
       return column.render(
-        column.dataIndex ? (record as any)[column.dataIndex] : record,
+        column.dataIndex ? (record as Record<string, unknown>)[column.dataIndex] : record,
         record,
         index
       );
     }
 
     if (column.dataIndex) {
-      return (record as any)[column.dataIndex];
+      return (record as Record<string, unknown>)[column.dataIndex];
     }
 
     return null;
@@ -488,7 +488,7 @@ export function Pagination({
     const maxVisible = 5;
     
     let startPage = Math.max(1, current - Math.floor(maxVisible / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+    const endPage = Math.min(totalPages, startPage + maxVisible - 1);
     
     if (endPage - startPage + 1 < maxVisible) {
       startPage = Math.max(1, endPage - maxVisible + 1);

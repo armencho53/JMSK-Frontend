@@ -30,8 +30,6 @@ interface Order {
     email?: string
     phone?: string
   }
-  contact_id?: number
-  contact?.name: string
   product_description: string
   specifications?: string
   quantity: number
