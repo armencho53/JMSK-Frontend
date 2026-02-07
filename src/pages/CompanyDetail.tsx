@@ -53,8 +53,8 @@ const getContactColumns = (): TableColumn<Contact>[] => [
   }
 ]
 
-// Define table columns for orders
-const getOrderColumns = (): TableColumn<Order>[] => [
+// Define table columns for orders with drill-down
+const getOrderColumns = (navigate: (path: string) => void): TableColumn<Order>[] => [
   {
     key: 'order_number',
     title: 'Order #',
@@ -73,10 +73,12 @@ const getOrderColumns = (): TableColumn<Order>[] => [
     responsive: 'tablet'
   },
   {
-    key: 'order_date',
-    title: 'Order Date',
-    dataIndex: 'order_date',
-    render: (value: string) => value ? new Date(value).toLocaleDateString() : '-',
+    key: 'product_description',
+    title: 'Product',
+    dataIndex: 'product_description',
+    render: (value: string) => (
+      <span className="text-slate-600">{value || '-'}</span>
+    ),
     responsive: 'desktop'
   },
   {
@@ -91,6 +93,23 @@ const getOrderColumns = (): TableColumn<Order>[] => [
     title: 'Status',
     dataIndex: 'status',
     render: (value: string) => <StatusBadge status={value} size="sm" />
+  },
+  {
+    key: 'actions',
+    title: '',
+    align: 'right' as const,
+    width: 80,
+    render: (_, record: Order) => (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate(`/orders/${record.id}`);
+        }}
+        className="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
+      >
+        View →
+      </button>
+    )
   }
 ]
 
@@ -134,7 +153,6 @@ export default function CompanyDetail() {
     enabled: !!companyId
   })
 
-  // Set document title (Requirement 7.1)
   useEffect(() => {
     if (company) {
       document.title = `${company.name} - Company Details - JMSK`
@@ -181,9 +199,8 @@ export default function CompanyDetail() {
     }
   })
 
-  // Define table columns
   const contactColumns = getContactColumns();
-  const orderColumns = getOrderColumns();
+  const orderColumns = getOrderColumns(navigate);
 
   if (companyLoading) {
     return (
@@ -310,10 +327,6 @@ export default function CompanyDetail() {
                 hoverable
                 responsive
                 emptyText="No contacts found for this company."
-                onRow={(record) => ({
-                  onClick: () => navigate(`/contacts/${record.id}`),
-                  className: 'cursor-pointer'
-                })}
               />
             </Card>
           )}

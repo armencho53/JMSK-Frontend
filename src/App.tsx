@@ -5,11 +5,10 @@ import { ThemeProvider } from './components/ThemeProvider'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Supplies from './pages/Supplies'
-import Contacts from './pages/Contacts'
-import ContactDetail from './pages/ContactDetail'
 import Companies from './pages/Companies'
 import CompanyDetail from './pages/CompanyDetail'
 import Orders from './pages/Orders'
+import OrderDetail from './pages/OrderDetail'
 import Manufacturing from './pages/Manufacturing'
 import Shipments from './pages/Shipments'
 import Roles from './pages/Roles'
@@ -57,11 +56,10 @@ function App() {
               } >
               <Route index element={<Dashboard />} />
               <Route path="supplies" element={<Supplies />} />
-              <Route path="contacts" element={<Contacts />} />
-              <Route path="contacts/:contactId" element={<ContactDetail />} />
               <Route path="companies" element={<Companies />} />
               <Route path="companies/:companyId" element={<CompanyDetail />} />
               <Route path="orders" element={<Orders />} />
+              <Route path="orders/:orderId" element={<OrderDetail />} />
               <Route path="manufacturing" element={<Manufacturing />} />
               <Route path="departments" element={<Departments />} />
               <Route path="shipments" element={<Shipments />} />
