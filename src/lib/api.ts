@@ -1,8 +1,8 @@
 import axios from 'axios'
 import { useAuthStore } from '../store/authStore'
+import { config } from '../config'
 
-// Handle environment variables for Vite
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_URL = config.apiUrl
 
 // Optimized axios instance for CloudFront/Lambda
 export const api = axios.create({

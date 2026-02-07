@@ -5,6 +5,8 @@ export default {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    // Mock config to avoid import.meta issues in tests
+    '^.*/config$': '<rootDir>/src/__mocks__/config.ts',
   },
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
@@ -14,6 +16,11 @@ export default {
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.(ts|tsx)',
     '<rootDir>/src/**/*.(test|spec).(ts|tsx)',
+  ],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    'vite.config.ts',
   ],
   collectCoverageFrom: [
     'src/**/*.(ts|tsx)',
