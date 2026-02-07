@@ -30,10 +30,8 @@ interface Order {
     email?: string
     phone?: string
   }
-  customer_id?: number
-  customer_name: string
-  customer_email?: string
-  customer_phone?: string
+  contact_id?: number
+  contact?.name: string
   product_description: string
   specifications?: string
   quantity: number
@@ -60,9 +58,9 @@ const getOrderColumns = (
     )
   },
   {
-    key: 'customer_name',
+    key: 'contact?.name',
     title: 'Contact',
-    dataIndex: 'customer_name',
+    dataIndex: 'contact?.name',
     sortable: true,
     render: (value: string, record: Order) => (
       <div>
@@ -402,7 +400,7 @@ export default function Orders() {
                         {selectedOrder.contact.name}
                       </button>
                     ) : (
-                      <p className="text-sm text-slate-900 mt-1">{selectedOrder.customer_name}</p>
+                      <p className="text-sm text-slate-900 mt-1">{selectedOrder.contact?.name}</p>
                     )}
                     {selectedOrder.company && (
                       <p className="text-xs text-slate-500 mt-0.5">{selectedOrder.company.name}</p>

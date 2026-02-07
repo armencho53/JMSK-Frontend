@@ -54,3 +54,9 @@ export interface CompanyStatistics {
   order_count: number
   average_order_value: number
 }
+
+export interface BalanceBreakdown {
+  total: number
+  pending: number
+  completed: number
+}

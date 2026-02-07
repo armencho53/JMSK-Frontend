@@ -249,7 +249,7 @@ export default function ShipmentFormModal({
                     <option value={0}>Select an order...</option>
                     {orders.map((order) => (
                       <option key={order.id} value={order.id}>
-                        {order.order_number} - {order.contact?.name || order.customer_name || 'Unknown Contact'}
+                        {order.order_number} - {order.contact?.name || order.contact?.name || "Unknown" || 'Unknown Contact'}
                       </option>
                     ))}
                   </select>

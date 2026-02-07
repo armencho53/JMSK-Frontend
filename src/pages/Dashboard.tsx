@@ -184,7 +184,7 @@ export default function Dashboard() {
                 Recent Orders
               </h2>
               <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-                Latest customer orders and their status
+                Latest contact orders and their status
               </p>
             </div>
             <div style={{ padding: '24px' }}>
@@ -211,7 +211,7 @@ export default function Dashboard() {
                             Order #{order.id}
                           </p>
                           <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-                            {order.contact?.name || order.customer_name || 'Customer'}
+                            {order.contact?.name || order.contact?.name || 'Contact'}
                           </p>
                         </div>
                       </div>

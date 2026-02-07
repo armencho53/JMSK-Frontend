@@ -30,7 +30,7 @@ interface ManufacturingStep {
 interface Order {
   id: number
   order_number: string
-  customer_name: string
+  contact_name: string
 }
 
 interface Department {
@@ -492,7 +492,7 @@ export default function ManufacturingFormModal({
                   <option value={0}>Select an order</option>
                   {orders.map((order) => (
                     <option key={order.id} value={order.id}>
-                      {order.order_number} - {order.customer_name}
+                      {order.order_number} - {order.contact?.name || "Unknown"}
                     </option>
                   ))}
                 </select>

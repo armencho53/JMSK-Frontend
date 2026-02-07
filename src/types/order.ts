@@ -15,17 +15,11 @@ export interface Order {
   tenant_id: number
   order_number: string
   
-  // New hierarchical fields
+  // Hierarchical contact system fields
   contact_id: number
   company_id: number
   contact?: ContactSummary  // Nested contact data (Requirement 3.1, 7.3)
   company?: CompanySummary  // Nested company data (Requirement 3.1, 7.3)
-  
-  // Legacy customer fields (for backward compatibility)
-  customer_id: number  // Maps to contact_id
-  customer_name: string
-  customer_email?: string
-  customer_phone?: string
   
   // Order details
   order_date?: string
@@ -47,9 +41,6 @@ export interface Order {
 
 export interface OrderCreate {
   contact_id: number  // Required for new orders
-  customer_name: string
-  customer_email?: string
-  customer_phone?: string
   product_description?: string
   specifications?: string
   quantity: number
@@ -62,9 +53,7 @@ export interface OrderCreate {
 }
 
 export interface OrderUpdate {
-  customer_name?: string
-  customer_email?: string
-  customer_phone?: string
+  contact_id?: number
   product_description?: string
   specifications?: string
   quantity?: number
