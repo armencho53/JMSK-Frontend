@@ -5,13 +5,11 @@ import api from '../lib/api'
 import { showSuccessToast, showErrorToast } from '../lib/toast'
 import OrderFormModal from '../components/OrderFormModal'
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal'
-import OrderTimeline from '../components/OrderTimeline'
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card'
+import { Card, CardContent } from '../components/ui/Card'
 import { Container } from '../components/ui/Container'
 import { StatusBadge } from '../components/ui/Status'
 import { Table, TableColumn } from '../components/ui/Table'
 import { Button } from '../components/ui/Button'
-import Modal from '../components/ui/Modal'
 import { Order } from '../types/order'
 
 // Define table columns for orders
@@ -148,7 +146,6 @@ const getOrderColumns = (
 export default function Orders() {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -261,8 +258,7 @@ export default function Orders() {
   }
 
   const handleViewDetails = (order: Order) => {
-    setSelectedOrder(order)
-    setIsDetailModalOpen(true)
+    navigate(`/orders/${order.id}`)
   }
 
   // Define table columns
@@ -337,104 +333,6 @@ export default function Orders() {
         onConfirm={handleDeleteConfirm}
         isDeleting={isDeleting}
       />
-
-      {/* Order Detail Modal */}
-      <Modal
-        isOpen={isDetailModalOpen}
-        onClose={() => setIsDetailModalOpen(false)}
-        title="Order Details"
-        size="lg"
-      >
-        {selectedOrder && (
-          <>
-            {/* Order Info */}
-            <Card variant="outlined" className="mb-4">
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs font-medium text-slate-600">Order Number</p>
-                    <p className="text-sm text-slate-900 mt-1">{selectedOrder.order_number}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-slate-600">Status</p>
-                    <div className="mt-1">
-                      <StatusBadge status={selectedOrder.status} size="sm" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-slate-600">Contact</p>
-                    {selectedOrder.contact_id && selectedOrder.contact ? (
-                      <button
-                        onClick={() => navigate(`/contacts/${selectedOrder.contact_id}`)}
-                        className="text-sm text-indigo-600 hover:text-indigo-800 hover:underline mt-1 font-medium"
-                      >
-                        {selectedOrder.contact.name}
-                      </button>
-                    ) : (
-                      <p className="text-sm text-slate-900 mt-1">{selectedOrder.contact?.name}</p>
-                    )}
-                    {selectedOrder.company && (
-                      <p className="text-xs text-slate-500 mt-0.5">{selectedOrder.company.name}</p>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-slate-600">Product</p>
-                    <p className="text-sm text-slate-900 mt-1">{selectedOrder.product_description}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-slate-600">Quantity</p>
-                    <p className="text-sm text-slate-900 mt-1">{selectedOrder.quantity}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-slate-600">Price</p>
-                    <p className="text-sm text-slate-900 mt-1">${selectedOrder.price?.toFixed(2) || '0.00'}</p>
-                  </div>
-                  {selectedOrder.due_date && (
-                    <div>
-                      <p className="text-xs font-medium text-slate-600">Due Date</p>
-                      <p className="text-sm text-slate-900 mt-1">{new Date(selectedOrder.due_date).toLocaleDateString()}</p>
-                    </div>
-                  )}
-                  {selectedOrder.specifications && (
-                    <div className="col-span-2">
-                      <p className="text-xs font-medium text-slate-600">Specifications</p>
-                      <p className="text-sm text-slate-900 mt-1">{selectedOrder.specifications}</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Manufacturing Timeline */}
-            <Card variant="default">
-              <CardHeader>
-                <CardTitle as="h4">Manufacturing Progress</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <OrderTimeline orderId={selectedOrder.id} />
-              </CardContent>
-            </Card>
-
-            <div className="flex justify-end space-x-3 mt-6">
-              <Button
-                variant="secondary"
-                onClick={() => setIsDetailModalOpen(false)}
-              >
-                Close
-              </Button>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setIsDetailModalOpen(false)
-                  handleEditClick(selectedOrder)
-                }}
-              >
-                Edit Order
-              </Button>
-            </div>
-          </>
-        )}
-      </Modal>
     </Container>
   )
 }
