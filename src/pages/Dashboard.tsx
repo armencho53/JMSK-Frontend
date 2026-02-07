@@ -211,7 +211,7 @@ export default function Dashboard() {
                             Order #{order.id}
                           </p>
                           <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-                            {order.contact?.name || order.contact?.name || 'Contact'}
+                            {order.contact?.name || 'Contact'}
                           </p>
                         </div>
                       </div>
