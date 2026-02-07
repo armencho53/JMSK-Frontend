@@ -58,8 +58,6 @@ jest.mock('./components/Layout', () => {
 
 // Mock all other page components
 jest.mock('./pages/Supplies', () => () => <div>Supplies</div>);
-jest.mock('./pages/Customers', () => () => <div>Customers</div>);
-jest.mock('./pages/CustomerDetail', () => () => <div>Customer Detail</div>);
 jest.mock('./pages/Companies', () => () => <div>Companies</div>);
 jest.mock('./pages/Orders', () => () => <div>Orders</div>);
 jest.mock('./pages/Manufacturing', () => () => <div>Manufacturing</div>);
