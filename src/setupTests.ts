@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 
 // Mock import.meta for Vite environment variables
-// @ts-ignore - import.meta is not available in Jest
+// @ts-expect-error - import.meta is not available in Jest
 globalThis.import = {
   meta: {
     env: {
