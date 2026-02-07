@@ -12,33 +12,7 @@ import { StatusBadge } from '../components/ui/Status'
 import { Table, TableColumn } from '../components/ui/Table'
 import { Button } from '../components/ui/Button'
 import Modal from '../components/ui/Modal'
-
-interface Order {
-  id: number
-  order_number: string
-  contact_id?: number
-  company_id?: number
-  contact?: {
-    id: number
-    name: string
-    email?: string
-    phone?: string
-  }
-  company?: {
-    id: number
-    name: string
-    email?: string
-    phone?: string
-  }
-  product_description: string
-  specifications?: string
-  quantity: number
-  price?: number
-  status: string
-  due_date?: string
-  created_at: string
-  updated_at: string
-}
+import { Order } from '../types/order'
 
 // Define table columns for orders
 const getOrderColumns = (
@@ -56,9 +30,8 @@ const getOrderColumns = (
     )
   },
   {
-    key: 'contact?.name',
+    key: 'contact',
     title: 'Contact',
-    dataIndex: 'contact?.name',
     sortable: true,
     render: (value: string, record: Order) => (
       <div>

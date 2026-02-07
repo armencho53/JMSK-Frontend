@@ -1,18 +1,18 @@
 import React, { useState, useMemo } from 'react';
 
 // Table Types
-export interface TableColumn<T = Record<string, unknown>> {
+export interface TableColumn<T = any> {
   key: string;
   title: string;
   dataIndex?: keyof T;
-  render?: (value: unknown, record: T, index: number) => React.ReactNode;
+  render?: (value: any, record: T, index: number) => React.ReactNode;
   sortable?: boolean;
   width?: string | number;
   align?: 'left' | 'center' | 'right';
   responsive?: 'always' | 'desktop' | 'tablet';
 }
 
-export interface TableProps<T = Record<string, unknown>> {
+export interface TableProps<T = any> {
   columns: TableColumn<T>[];
   data: T[];
   loading?: boolean;
@@ -63,7 +63,7 @@ interface SortState {
 }
 
 // Table Component
-export function Table<T = Record<string, unknown>>({
+export function Table<T = any>({
   columns,
   data,
   loading = false,
@@ -86,7 +86,7 @@ export function Table<T = Record<string, unknown>>({
     if (typeof rowKey === 'function') {
       return rowKey(record);
     }
-    return (record as Record<string, unknown>)[rowKey] as string | number || index;
+    return (record as any)[rowKey] || index;
   };
 
   // Handle sorting
@@ -113,8 +113,8 @@ export function Table<T = Record<string, unknown>>({
     if (!column) return data;
 
     return [...data].sort((a, b) => {
-      const aValue = column.dataIndex ? (a as Record<string, unknown>)[column.dataIndex] : a;
-      const bValue = column.dataIndex ? (b as Record<string, unknown>)[column.dataIndex] : b;
+      const aValue = column.dataIndex ? (a as any)[column.dataIndex] : a;
+      const bValue = column.dataIndex ? (b as any)[column.dataIndex] : b;
 
       let comparison = 0;
       if (aValue < bValue) comparison = -1;
@@ -196,14 +196,14 @@ export function Table<T = Record<string, unknown>>({
   const renderCell = (column: TableColumn<T>, record: T, index: number) => {
     if (column.render) {
       return column.render(
-        column.dataIndex ? (record as Record<string, unknown>)[column.dataIndex] : record,
+        column.dataIndex ? (record as any)[column.dataIndex] : record,
         record,
         index
       );
     }
 
     if (column.dataIndex) {
-      return (record as Record<string, unknown>)[column.dataIndex];
+      return (record as any)[column.dataIndex];
     }
 
     return null;

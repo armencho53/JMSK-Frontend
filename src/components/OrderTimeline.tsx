@@ -69,7 +69,7 @@ export default function OrderTimeline({ orderId }: OrderTimelineProps) {
       {/* Order Info */}
       <div className="mb-4 pb-3 border-b border-gray-200">
         <h4 className="text-sm font-medium text-gray-900">{data.order_number}</h4>
-        <p className="text-xs text-gray-600">{data.contact?.name || "Unknown"} - {data.product_description}</p>
+        <p className="text-xs text-gray-600">{data.contact_name || "Unknown"} - {data.product_description}</p>
       </div>
 
       {/* Timeline */}

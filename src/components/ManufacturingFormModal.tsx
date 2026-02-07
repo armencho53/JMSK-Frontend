@@ -492,7 +492,7 @@ export default function ManufacturingFormModal({
                   <option value={0}>Select an order</option>
                   {orders.map((order) => (
                     <option key={order.id} value={order.id}>
-                      {order.order_number} - {order.contact?.name || "Unknown"}
+                      {order.order_number} - {order.contact_name || "Unknown"}
                     </option>
                   ))}
                 </select>
