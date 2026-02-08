@@ -3,7 +3,6 @@ import api from '../lib/api'
 
 interface TimelineStep {
   id: number
-  step_name: string
   step_type: string
   status: string
   duration_hours?: number
@@ -102,7 +101,7 @@ export default function OrderTimeline({ orderId }: OrderTimelineProps) {
               <div className="ml-4 flex-1">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{step.step_name}</p>
+                    <p className="text-sm font-medium text-gray-900">{step.step_type.replace(/_/g, ' ')}</p>
                     <p className="text-xs text-gray-500 capitalize">{step.status.replace('_', ' ')}</p>
                   </div>
                   {step.duration_hours !== null && step.duration_hours !== undefined && (

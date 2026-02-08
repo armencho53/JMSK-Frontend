@@ -7,7 +7,6 @@ interface ManufacturingStep {
   order_id: number
   parent_step_id?: number
   step_type?: string
-  step_name?: string
   description?: string
   status: string
   department?: string
@@ -52,7 +51,6 @@ interface TransferFormData {
   quantity: number
   weight: number
   next_step_type: string
-  next_step_name: string
   received_by: string
   department?: string
 }
@@ -60,7 +58,6 @@ interface TransferFormData {
 interface ManufacturingFormData {
   order_id: number
   step_type: string
-  step_name?: string  // Now optional - type should be sufficient
   description?: string
   status?: string
   department?: string
@@ -102,13 +99,11 @@ export default function ManufacturingFormModal({
   const [formData, setFormData] = useState<ManufacturingFormData>({
     order_id: 0,
     step_type: '',
-    step_name: '',  // Optional - defaults to empty string
   })
   const [transferData, setTransferData] = useState<TransferFormData>({
     quantity: 0,
     weight: 0,
     next_step_type: '',
-    next_step_name: '',
     received_by: '',
     department: '',
   })
@@ -144,7 +139,6 @@ export default function ManufacturingFormModal({
         setFormData({
           order_id: step.order_id,
           step_type: step.step_type || '',
-          step_name: step.step_name || '',
           description: step.description,
           status: step.status,
           department: step.department,
@@ -169,7 +163,6 @@ export default function ManufacturingFormModal({
               quantity: 0,
               weight: 0,
               next_step_type: '',
-              next_step_name: '',
               received_by: '',
               department: '',
             })
@@ -182,7 +175,6 @@ export default function ManufacturingFormModal({
         setFormData({
           order_id: 0,
           step_type: '',
-          step_name: '',  // Optional field
         })
       }
       setErrors({})
@@ -223,8 +215,8 @@ export default function ManufacturingFormModal({
         newErrors.next_step_type = 'Next step type is required'
       }
 
-      if (!transferData.next_step_name.trim()) {
-        newErrors.next_step_name = 'Next step name is required'
+      if (!transferData.next_step_type.trim()) {
+        newErrors.next_step_type = 'Next step type is required'
       }
 
       if (!transferData.received_by.trim()) {
@@ -243,8 +235,6 @@ export default function ManufacturingFormModal({
       if (!formData.step_type) {
         newErrors.step_type = 'Step type is required'
       }
-
-      // step_name is now optional - type should be sufficient
 
       // Quantity tracking validation
       if (formData.quantity_received !== undefined && formData.quantity_received < 0) {
@@ -311,7 +301,7 @@ export default function ManufacturingFormModal({
             </h3>
             {mode === 'transfer' && step && (
               <p className="mt-1 text-sm text-gray-600">
-                Transfer items from: <span className="font-medium">{step.step_name}</span>
+                Transfer items from: <span className="font-medium">{step.step_type}</span>
               </p>
             )}
           </div>
@@ -401,26 +391,6 @@ export default function ManufacturingFormModal({
                     </select>
                     {errors.next_step_type && (
                       <p className="mt-1 text-sm text-red-600">{errors.next_step_type}</p>
-                    )}
-                  </div>
-
-                  {/* Next Step Name */}
-                  <div>
-                    <label htmlFor="next_step_name" className="block text-sm font-medium text-gray-700">
-                      Next Step Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="next_step_name"
-                      value={transferData.next_step_name}
-                      onChange={(e) => setTransferData({ ...transferData, next_step_name: e.target.value })}
-                      className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                        errors.next_step_name ? 'border-red-500' : ''
-                      }`}
-                      placeholder="e.g., Polish ring"
-                    />
-                    {errors.next_step_name && (
-                      <p className="mt-1 text-sm text-red-600">{errors.next_step_name}</p>
                     )}
                   </div>
 
@@ -524,21 +494,6 @@ export default function ManufacturingFormModal({
                 {errors.step_type && (
                   <p className="mt-1 text-sm text-red-600">{errors.step_type}</p>
                 )}
-              </div>
-
-              {/* Step Name (Optional) */}
-              <div>
-                <label htmlFor="step_name" className="block text-sm font-medium text-gray-700">
-                  Step Name <span className="text-gray-400 text-xs">(Optional)</span>
-                </label>
-                <input
-                  type="text"
-                  id="step_name"
-                  value={formData.step_name}
-                  onChange={(e) => setFormData({ ...formData, step_name: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  placeholder="e.g., Initial casting of ring base"
-                />
               </div>
 
               {/* Description */}

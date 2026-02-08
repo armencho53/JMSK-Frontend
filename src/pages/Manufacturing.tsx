@@ -13,7 +13,6 @@ interface ManufacturingStep {
   order_id: number
   parent_step_id?: number
   step_type?: string
-  step_name?: string
   description?: string
   status: string
   department?: string
@@ -37,7 +36,6 @@ interface TransferFormData {
   quantity: number
   weight: number
   next_step_type: string
-  next_step_name: string
   received_by: string
   department?: string
 }
@@ -45,7 +43,6 @@ interface TransferFormData {
 interface ManufacturingFormData {
   order_id: number
   step_type: string
-  step_name?: string  // Now optional - type should be sufficient
   description?: string
   status?: string
   department?: string
@@ -257,9 +254,9 @@ export default function Manufacturing() {
                       Order #{step.order_id}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">{step.step_name || '-'}</div>
-                      {step.step_type && (
-                        <div className="text-xs text-gray-500">{step.step_type.replace(/_/g, ' ')}</div>
+                      <div className="text-sm font-medium text-gray-900">{step.step_type?.replace(/_/g, ' ') || '-'}</div>
+                      {step.description && (
+                        <div className="text-xs text-gray-500">{step.description}</div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -329,7 +326,7 @@ export default function Manufacturing() {
               <div className="bg-white rounded-lg max-w-2xl w-full p-6">
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-lg font-medium text-gray-900">
-                    {detailStep.step_name} - Order #{detailStep.order_id}
+                    {detailStep.step_type?.replace(/_/g, ' ') || 'Manufacturing Step'} - Order #{detailStep.order_id}
                   </h3>
                   <button
                     onClick={() => setDetailStep(null)}
@@ -498,7 +495,7 @@ export default function Manufacturing() {
           setIsDeleteModalOpen(false)
           setStepToDelete(null)
         }}
-        itemName={stepToDelete?.step_name || ''}
+        itemName={stepToDelete?.step_type?.replace(/_/g, ' ') || 'Manufacturing Step'}
         itemType="Manufacturing Step"
         onConfirm={handleDeleteConfirm}
         isDeleting={deleteMutation.isPending}
