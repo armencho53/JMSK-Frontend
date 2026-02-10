@@ -1,25 +1,7 @@
 import { useEffect, useState } from 'react'
-import CustomerSelector from './CustomerSelector'
-
-interface Order {
-  id: number
-  order_number: string
-  customer_id?: number
-  customer_name: string
-  customer_email?: string
-  customer_phone?: string
-  product_description: string
-  specifications?: string
-  quantity: number
-  price?: number
-  status: string
-  due_date?: string
-  metal_type?: string
-  target_weight_per_piece?: number
-  initial_total_weight?: number
-  created_at: string
-  updated_at: string
-}
+import ContactSelector from './ContactSelector'
+import type { Order } from '../types/order'
+import type { Contact } from '../types/contact'
 
 interface OrderFormModalProps {
   isOpen: boolean
@@ -31,10 +13,7 @@ interface OrderFormModalProps {
 }
 
 interface OrderFormData {
-  customer_id?: number
-  customer_name: string
-  customer_email?: string
-  customer_phone?: string
+  contact_id?: number
   product_description: string
   specifications?: string
   quantity: number
@@ -47,22 +26,22 @@ interface OrderFormData {
 }
 
 const statusOptions = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'in_progress', label: 'In Progress' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'shipped', label: 'Shipped' },
-  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'PENDING', label: 'Pending' },
+  { value: 'IN_PROGRESS', label: 'In Progress' },
+  { value: 'COMPLETED', label: 'Completed' },
+  { value: 'SHIPPED', label: 'Shipped' },
+  { value: 'CANCELLED', label: 'Cancelled' },
 ]
 
 const metalTypeOptions = [
   { value: '', label: 'Select metal type' },
-  { value: 'gold_24k', label: 'Gold 24K' },
-  { value: 'gold_22k', label: 'Gold 22K' },
-  { value: 'gold_18k', label: 'Gold 18K' },
-  { value: 'gold_14k', label: 'Gold 14K' },
-  { value: 'silver_925', label: 'Silver 925' },
-  { value: 'platinum', label: 'Platinum' },
-  { value: 'other', label: 'Other' },
+  { value: 'GOLD_24K', label: 'Gold 24K' },
+  { value: 'GOLD_22K', label: 'Gold 22K' },
+  { value: 'GOLD_18K', label: 'Gold 18K' },
+  { value: 'GOLD_14K', label: 'Gold 14K' },
+  { value: 'SILVER_925', label: 'Silver 925' },
+  { value: 'PLATINUM', label: 'Platinum' },
+  { value: 'OTHER', label: 'Other' },
 ]
 
 export default function OrderFormModal({
@@ -74,21 +53,18 @@ export default function OrderFormModal({
   isSubmitting,
 }: OrderFormModalProps) {
   const [formData, setFormData] = useState<OrderFormData>({
-    customer_name: '',
     product_description: '',
     quantity: 1,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [selectedContact, setSelectedContact] = useState<Contact | undefined>()
 
   useEffect(() => {
     if (isOpen) {
       if (mode === 'edit' && order) {
         setFormData({
-          customer_id: order.customer_id,
-          customer_name: order.customer_name,
-          customer_email: order.customer_email,
-          customer_phone: order.customer_phone,
-          product_description: order.product_description,
+          contact_id: order.contact_id,
+          product_description: order.product_description || '',
           specifications: order.specifications,
           quantity: order.quantity,
           price: order.price,
@@ -98,12 +74,15 @@ export default function OrderFormModal({
           target_weight_per_piece: order.target_weight_per_piece,
           initial_total_weight: order.initial_total_weight,
         })
+        if (order.contact) {
+          setSelectedContact(order.contact as Contact)
+        }
       } else {
         setFormData({
-          customer_name: '',
           product_description: '',
           quantity: 1,
         })
+        setSelectedContact(undefined)
       }
       setErrors({})
     }
@@ -123,8 +102,8 @@ export default function OrderFormModal({
   const validate = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!formData.customer_name.trim()) {
-      newErrors.customer_name = 'Customer name is required'
+    if (!formData.contact_id) {
+      newErrors.contact_id = 'Contact is required'
     }
 
     if (!formData.product_description.trim()) {
@@ -206,95 +185,35 @@ export default function OrderFormModal({
                 }
                 onSubmit(formData)
               }} className="space-y-4">
-                {/* Customer Selector */}
-                <CustomerSelector
-                  value={formData.customer_id}
-                  onChange={(customerId, customer) => {
-                    if (customer) {
-                      setFormData({
-                        ...formData,
-                        customer_id: customerId,
-                        customer_name: customer.name,
-                        customer_email: customer.email,
-                        customer_phone: customer.phone || '',
-                      })
-                    } else {
-                      setFormData({
-                        ...formData,
-                        customer_id: undefined,
-                        customer_name: '',
-                        customer_email: '',
-                        customer_phone: '',
-                      })
-                    }
+                {/* Contact Selector */}
+                <ContactSelector
+                  value={formData.contact_id}
+                  onChange={(contactId, contact: Contact | undefined) => {
+                    setFormData({
+                      ...formData,
+                      contact_id: contactId,
+                    })
+                    setSelectedContact(contact)
                   }}
-                  error={errors.customer_name}
+                  error={errors.contact_id}
                 />
 
-                {/* Customer Name */}
-                <div>
-                  <label
-                    htmlFor="customer-name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Customer Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="customer-name"
-                    value={formData.customer_name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, customer_name: e.target.value })
-                    }
-                    className={`mt-1 block w-full border ${
-                      errors.customer_name ? 'border-red-300' : 'border-gray-300'
-                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                    placeholder="John Doe"
-                  />
-                  {errors.customer_name && (
-                    <p className="mt-1 text-sm text-red-600">{errors.customer_name}</p>
-                  )}
-                </div>
-
-                {/* Customer Email */}
-                <div>
-                  <label
-                    htmlFor="customer-email"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Customer Email
-                  </label>
-                  <input
-                    type="email"
-                    id="customer-email"
-                    value={formData.customer_email || ''}
-                    onChange={(e) =>
-                      setFormData({ ...formData, customer_email: e.target.value })
-                    }
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="john@example.com"
-                  />
-                </div>
-
-                {/* Customer Phone */}
-                <div>
-                  <label
-                    htmlFor="customer-phone"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Customer Phone
-                  </label>
-                  <input
-                    type="tel"
-                    id="customer-phone"
-                    value={formData.customer_phone || ''}
-                    onChange={(e) =>
-                      setFormData({ ...formData, customer_phone: e.target.value })
-                    }
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="+1 (555) 123-4567"
-                  />
-                </div>
+                {/* Selected Contact Display */}
+                {selectedContact && (
+                  <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
+                    <p className="text-sm font-medium text-gray-700">Selected Contact:</p>
+                    <p className="text-sm text-gray-900 mt-1">{selectedContact.name}</p>
+                    {selectedContact.email && (
+                      <p className="text-xs text-gray-600">{selectedContact.email}</p>
+                    )}
+                    {selectedContact.phone && (
+                      <p className="text-xs text-gray-600">{selectedContact.phone}</p>
+                    )}
+                    {selectedContact.company && (
+                      <p className="text-xs text-gray-500 mt-1">Company: {selectedContact.company.name}</p>
+                    )}
+                  </div>
+                )}
 
                 {/* Product Description */}
                 <div>
@@ -474,7 +393,7 @@ export default function OrderFormModal({
                     </label>
                     <select
                       id="status"
-                      value={formData.status || 'pending'}
+                      value={formData.status || 'PENDING'}
                       onChange={(e) =>
                         setFormData({ ...formData, status: e.target.value })
                       }

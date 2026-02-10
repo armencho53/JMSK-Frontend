@@ -1,17 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Company } from '../types/customer'
+import { Company } from '../types/company'
 
 interface CompanyFormModalProps {
   isOpen: boolean
   onClose: () => void
   mode: 'create' | 'edit'
   company?: Company | null
-  onSubmit: (data: {
-    name: string
-    address?: string
-    phone?: string
-    email?: string
-  }) => void
+  onSubmit: (data: any) => void
   isSubmitting: boolean
 }
 
@@ -25,9 +20,8 @@ export default function CompanyFormModal({
 }: CompanyFormModalProps) {
   const [formData, setFormData] = useState({
     name: '',
-    address: '',
-    phone: '',
     email: '',
+    phone: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -36,16 +30,14 @@ export default function CompanyFormModal({
       if (mode === 'edit' && company) {
         setFormData({
           name: company.name,
-          address: company.address || '',
-          phone: company.phone || '',
           email: company.email || '',
+          phone: company.phone || '',
         })
       } else {
         setFormData({
           name: '',
-          address: '',
-          phone: '',
           email: '',
+          phone: '',
         })
       }
       setErrors({})
@@ -70,7 +62,7 @@ export default function CompanyFormModal({
       newErrors.name = 'Name is required'
     }
 
-    if (formData.email.trim()) {
+    if (formData.email && formData.email.trim()) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(formData.email)) {
         newErrors.email = 'Invalid email format'
@@ -90,9 +82,8 @@ export default function CompanyFormModal({
 
     const submitData: any = {
       name: formData.name.trim(),
-      address: formData.address.trim() || undefined,
-      phone: formData.phone.trim() || undefined,
       email: formData.email.trim() || undefined,
+      phone: formData.phone.trim() || undefined,
     }
 
     onSubmit(submitData)
@@ -181,21 +172,26 @@ export default function CompanyFormModal({
 
                 <div>
                   <label
-                    htmlFor="company-address"
+                    htmlFor="company-email"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Address
+                    Email
                   </label>
-                  <textarea
-                    id="company-address"
-                    rows={3}
-                    value={formData.address}
+                  <input
+                    type="email"
+                    id="company-email"
+                    value={formData.email}
                     onChange={(e) =>
-                      setFormData({ ...formData, address: e.target.value })
+                      setFormData({ ...formData, email: e.target.value })
                     }
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    placeholder="123 Main St, City, State, ZIP"
+                    className={`mt-1 block w-full border ${
+                      errors.email ? 'border-red-300' : 'border-gray-300'
+                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                    placeholder="info@acme.com"
                   />
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                  )}
                 </div>
 
                 <div>
@@ -215,30 +211,6 @@ export default function CompanyFormModal({
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="+1 (555) 123-4567"
                   />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="company-email"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="company-email"
-                    value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
-                    className={`mt-1 block w-full border ${
-                      errors.email ? 'border-red-300' : 'border-gray-300'
-                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                    placeholder="contact@company.com"
-                  />
-                  {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                  )}
                 </div>
 
                 <div className="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">

@@ -69,8 +69,8 @@ export default function Dashboard() {
     )
   }
 
-  const activeOrders = orders?.filter((o: any) => o.status === 'in_progress' || o.status === 'pending') || []
-  const completedOrders = orders?.filter((o: any) => o.status === 'completed') || []
+  const activeOrders = orders?.filter((o: any) => o.status === 'IN_PROGRESS' || o.status === 'PENDING') || []
+  const completedOrders = orders?.filter((o: any) => o.status === 'COMPLETED') || []
 
   return (
     <div className="p-8 bg-slate-50 min-h-screen">
@@ -184,7 +184,7 @@ export default function Dashboard() {
                 Recent Orders
               </h2>
               <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-                Latest customer orders and their status
+                Latest contact orders and their status
               </p>
             </div>
             <div style={{ padding: '24px' }}>
@@ -211,7 +211,7 @@ export default function Dashboard() {
                             Order #{order.id}
                           </p>
                           <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-                            {order.customer_name || 'Customer'}
+                            {order.contact?.name || 'Contact'}
                           </p>
                         </div>
                       </div>
@@ -222,14 +222,14 @@ export default function Dashboard() {
                           fontSize: '12px',
                           fontWeight: '500',
                           borderRadius: '20px',
-                          backgroundColor: order.status === 'completed' 
+                          backgroundColor: order.status === 'COMPLETED' 
                             ? '#dcfce7' 
-                            : order.status === 'in_progress'
+                            : order.status === 'IN_PROGRESS'
                             ? '#fed7aa'
                             : '#f1f5f9',
-                          color: order.status === 'completed' 
+                          color: order.status === 'COMPLETED' 
                             ? '#166534' 
-                            : order.status === 'in_progress'
+                            : order.status === 'IN_PROGRESS'
                             ? '#9a3412'
                             : '#475569'
                         }}>

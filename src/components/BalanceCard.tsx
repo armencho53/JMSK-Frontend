@@ -1,4 +1,4 @@
-import { BalanceBreakdown } from '../types/customer'
+import { BalanceBreakdown } from '../types/company'
 
 interface BalanceCardProps {
   balance: BalanceBreakdown

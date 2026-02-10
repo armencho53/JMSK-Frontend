@@ -10,7 +10,7 @@ interface BreadcrumbItem {
 const routeNames: Record<string, string> = {
   '/': 'Dashboard',
   '/supplies': 'Supplies',
-  '/customers': 'Customers',
+  '/contacts': 'Contacts',
   '/companies': 'Companies',
   '/orders': 'Orders',
   '/manufacturing': 'Manufacturing',
@@ -41,7 +41,7 @@ export default function Breadcrumbs() {
           href: index === pathSegments.length - 1 ? undefined : currentPath
         });
       } else {
-        // Handle dynamic routes (like customer detail)
+        // Handle dynamic routes (like contact detail)
         const parentPath = currentPath.substring(0, currentPath.lastIndexOf('/'));
         if (routeNames[parentPath]) {
           // This is likely an ID or detail page

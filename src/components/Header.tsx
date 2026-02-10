@@ -84,7 +84,7 @@ export default function Header({ onMobileMenuToggle, sidebarCollapsed }: HeaderP
             <div className="flex-1 max-w-lg ml-4 lg:ml-0" role="search">
               <form onSubmit={handleSearch} className="relative">
                 <label htmlFor="global-search" className="sr-only">
-                  Search orders, customers, and supplies
+                  Search orders, contacts, and supplies
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -96,11 +96,11 @@ export default function Header({ onMobileMenuToggle, sidebarCollapsed }: HeaderP
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-900 placeholder-slate-500 text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
-                    placeholder="Search orders, customers, supplies..."
+                    placeholder="Search orders, contacts, supplies..."
                     aria-describedby="search-description"
                   />
                   <div id="search-description" className="sr-only">
-                    Search across orders, customers, and supplies in the system
+                    Search across orders, contacts, and supplies in the system
                   </div>
                 </div>
               </form>

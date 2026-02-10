@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import api from '../lib/api'
+import { Order } from '../types/order'
 
 interface Shipment {
   id: number
@@ -15,12 +16,6 @@ interface Shipment {
   delivered_at?: string
   created_at: string
   updated_at: string
-}
-
-interface Order {
-  id: number
-  order_number: string
-  customer_name: string
 }
 
 interface ShipmentFormModalProps {
@@ -43,11 +38,11 @@ interface ShipmentFormData {
 }
 
 const statusOptions = [
-  { value: 'preparing', label: 'Preparing' },
-  { value: 'shipped', label: 'Shipped' },
-  { value: 'in_transit', label: 'In Transit' },
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'returned', label: 'Returned' },
+  { value: 'PREPARING', label: 'Preparing' },
+  { value: 'SHIPPED', label: 'Shipped' },
+  { value: 'IN_TRANSIT', label: 'In Transit' },
+  { value: 'DELIVERED', label: 'Delivered' },
+  { value: 'RETURNED', label: 'Returned' },
 ]
 
 export default function ShipmentFormModal({
@@ -65,6 +60,7 @@ export default function ShipmentFormModal({
     shipping_address: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [isLoadingAddress, setIsLoadingAddress] = useState(false)
 
   // Fetch orders for the dropdown
   const { data: orders = [] } = useQuery<Order[]>({
@@ -75,6 +71,35 @@ export default function ShipmentFormModal({
     },
     enabled: isOpen,
   })
+
+  // Function to fetch and populate default address for a company
+  const fetchDefaultAddress = async (companyId: number) => {
+    setIsLoadingAddress(true)
+    try {
+      const { data } = await api.get(`/companies/${companyId}/addresses/shipment-default`)
+      if (data) {
+        // Format the address as a string for the textarea
+        const addressString = `${data.street_address}\n${data.city}, ${data.state} ${data.zip_code}\n${data.country}`
+        setFormData(prev => ({ ...prev, shipping_address: addressString }))
+      }
+    } catch (error) {
+      console.error('Failed to fetch default address:', error)
+      // Don't show error to user - just leave address empty
+    } finally {
+      setIsLoadingAddress(false)
+    }
+  }
+
+  // Handle order selection change
+  const handleOrderChange = (orderId: number) => {
+    setFormData({ ...formData, order_id: orderId })
+    
+    // Find the selected order and fetch its company's default address
+    const selectedOrder = orders.find(order => order.id === orderId)
+    if (selectedOrder && selectedOrder.company_id) {
+      fetchDefaultAddress(selectedOrder.company_id)
+    }
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -215,18 +240,16 @@ export default function ShipmentFormModal({
                   <select
                     id="order"
                     value={formData.order_id}
-                    onChange={(e) =>
-                      setFormData({ ...formData, order_id: parseInt(e.target.value) })
-                    }
+                    onChange={(e) => handleOrderChange(parseInt(e.target.value))}
                     className={`mt-1 block w-full border ${
                       errors.order_id ? 'border-red-300' : 'border-gray-300'
                     } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                    disabled={mode === 'edit'}
+                    disabled={mode === 'edit' || isLoadingAddress}
                   >
                     <option value={0}>Select an order...</option>
                     {orders.map((order) => (
                       <option key={order.id} value={order.id}>
-                        {order.order_number} - {order.customer_name}
+                        {order.order_number} - {order.contact?.name || order.contact?.name || "Unknown" || 'Unknown Contact'}
                       </option>
                     ))}
                   </select>
@@ -293,6 +316,9 @@ export default function ShipmentFormModal({
                   >
                     Shipping Address <span className="text-red-500">*</span>
                   </label>
+                  {isLoadingAddress && (
+                    <p className="mt-1 text-sm text-blue-600">Loading company address...</p>
+                  )}
                   <textarea
                     id="shipping-address"
                     rows={3}
@@ -307,6 +333,11 @@ export default function ShipmentFormModal({
                   />
                   {errors.shipping_address && (
                     <p className="mt-1 text-sm text-red-600">{errors.shipping_address}</p>
+                  )}
+                  {!errors.shipping_address && formData.shipping_address && mode === 'create' && (
+                    <p className="mt-1 text-sm text-gray-500">
+                      Auto-populated from company default. You can modify this address for this shipment.
+                    </p>
                   )}
                 </div>
 
@@ -351,7 +382,7 @@ export default function ShipmentFormModal({
                     </label>
                     <select
                       id="status"
-                      value={formData.status || 'preparing'}
+                      value={formData.status || 'PREPARING'}
                       onChange={(e) =>
                         setFormData({ ...formData, status: e.target.value })
                       }

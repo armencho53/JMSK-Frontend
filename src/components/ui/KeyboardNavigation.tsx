@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 /**
  * Hook for managing focus within a component
@@ -33,7 +33,7 @@ export function useFocusManagement(options: {
     };
   }, [autoFocus, restoreFocus]);
 
-  const handleKeyDown = (event: KeyboardEvent) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
     if (trapFocus && event.key === 'Tab' && containerRef.current) {
       const focusableElements = containerRef.current.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -53,14 +53,14 @@ export function useFocusManagement(options: {
         }
       }
     }
-  };
+  }, [trapFocus]);
 
   useEffect(() => {
     if (trapFocus) {
       document.addEventListener('keydown', handleKeyDown);
       return () => document.removeEventListener('keydown', handleKeyDown);
     }
-  }, [trapFocus]);
+  }, [trapFocus, handleKeyDown]);
 
   return containerRef;
 }

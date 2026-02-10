@@ -12,7 +12,7 @@ export const THEME_OPTIONS = [{ key: 'professional' as const, name: 'Professiona
 /**
  * Legacy compatibility function - no-op since we only have professional theme
  */
-export function applyTheme(_theme: any): void {
+export function applyTheme(): void {
   // No-op - professional theme is always applied
 }
 

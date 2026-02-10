@@ -3,7 +3,6 @@ import api from '../lib/api'
 
 interface TimelineStep {
   id: number
-  step_name: string
   step_type: string
   status: string
   duration_hours?: number
@@ -13,7 +12,7 @@ interface TimelineStep {
 interface TimelineData {
   order_id: number
   order_number: string
-  customer_name: string
+  contact_name: string
   product_description: string
   steps: TimelineStep[]
   total_steps: number
@@ -69,7 +68,7 @@ export default function OrderTimeline({ orderId }: OrderTimelineProps) {
       {/* Order Info */}
       <div className="mb-4 pb-3 border-b border-gray-200">
         <h4 className="text-sm font-medium text-gray-900">{data.order_number}</h4>
-        <p className="text-xs text-gray-600">{data.customer_name} - {data.product_description}</p>
+        <p className="text-xs text-gray-600">{data.contact_name || "Unknown"} - {data.product_description}</p>
       </div>
 
       {/* Timeline */}
@@ -102,7 +101,7 @@ export default function OrderTimeline({ orderId }: OrderTimelineProps) {
               <div className="ml-4 flex-1">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{step.step_name}</p>
+                    <p className="text-sm font-medium text-gray-900">{step.step_type.replace(/_/g, ' ')}</p>
                     <p className="text-xs text-gray-500 capitalize">{step.status.replace('_', ' ')}</p>
                   </div>
                   {step.duration_hours !== null && step.duration_hours !== undefined && (

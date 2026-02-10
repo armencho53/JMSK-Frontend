@@ -1,33 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import api from '../lib/api'
 import { showSuccessToast, showErrorToast } from '../lib/toast'
 import OrderFormModal from '../components/OrderFormModal'
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal'
-import OrderTimeline from '../components/OrderTimeline'
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card'
+import { Card, CardContent } from '../components/ui/Card'
 import { Container } from '../components/ui/Container'
 import { StatusBadge } from '../components/ui/Status'
 import { Table, TableColumn } from '../components/ui/Table'
 import { Button } from '../components/ui/Button'
-import Modal from '../components/ui/Modal'
-
-interface Order {
-  id: number
-  order_number: string
-  customer_id?: number
-  customer_name: string
-  customer_email?: string
-  customer_phone?: string
-  product_description: string
-  specifications?: string
-  quantity: number
-  price?: number
-  status: string
-  due_date?: string
-  created_at: string
-  updated_at: string
-}
+import { Order } from '../types/order'
 
 // Define table columns for orders
 const getOrderColumns = (
@@ -45,10 +28,33 @@ const getOrderColumns = (
     )
   },
   {
-    key: 'customer_name',
-    title: 'Customer',
-    dataIndex: 'customer_name',
-    sortable: true
+    key: 'contact',
+    title: 'Contact',
+    sortable: true,
+    render: (value: string, record: Order) => (
+      <div>
+        {/* Clickable contact name (Requirements 3.1, 7.3) */}
+        {record.contact_id && record.contact ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              window.location.href = `/contacts/${record.contact_id}`
+            }}
+            className="text-indigo-600 hover:text-indigo-800 hover:underline font-medium"
+          >
+            {record.contact.name}
+          </button>
+        ) : (
+          <span className="font-medium">{value}</span>
+        )}
+        {/* Show company name as secondary info */}
+        {record.company && (
+          <div className="text-xs text-slate-500 mt-0.5">
+            {record.company.name}
+          </div>
+        )}
+      </div>
+    )
   },
   {
     key: 'product_description',
@@ -140,13 +146,18 @@ const getOrderColumns = (
 export default function Orders() {
   const [isFormModalOpen, setIsFormModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [formMode, setFormMode] = useState<'create' | 'edit'>('create')
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
+
+  // Set document title (Requirement 7.1)
+  useEffect(() => {
+    document.title = 'Orders - JMSK'
+  }, [])
 
   const { data: orders, isLoading, error } = useQuery({
     queryKey: ['orders'],
@@ -247,8 +258,7 @@ export default function Orders() {
   }
 
   const handleViewDetails = (order: Order) => {
-    setSelectedOrder(order)
-    setIsDetailModalOpen(true)
+    navigate(`/orders/${order.id}`)
   }
 
   // Define table columns
@@ -323,92 +333,6 @@ export default function Orders() {
         onConfirm={handleDeleteConfirm}
         isDeleting={isDeleting}
       />
-
-      {/* Order Detail Modal */}
-      <Modal
-        isOpen={isDetailModalOpen}
-        onClose={() => setIsDetailModalOpen(false)}
-        title="Order Details"
-        size="lg"
-      >
-        {selectedOrder && (
-          <>
-            {/* Order Info */}
-            <Card variant="outlined" className="mb-4">
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs font-medium text-slate-600">Order Number</p>
-                    <p className="text-sm text-slate-900 mt-1">{selectedOrder.order_number}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-slate-600">Status</p>
-                    <div className="mt-1">
-                      <StatusBadge status={selectedOrder.status} size="sm" />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-slate-600">Customer</p>
-                    <p className="text-sm text-slate-900 mt-1">{selectedOrder.customer_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-slate-600">Product</p>
-                    <p className="text-sm text-slate-900 mt-1">{selectedOrder.product_description}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-slate-600">Quantity</p>
-                    <p className="text-sm text-slate-900 mt-1">{selectedOrder.quantity}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-slate-600">Price</p>
-                    <p className="text-sm text-slate-900 mt-1">${selectedOrder.price?.toFixed(2) || '0.00'}</p>
-                  </div>
-                  {selectedOrder.due_date && (
-                    <div>
-                      <p className="text-xs font-medium text-slate-600">Due Date</p>
-                      <p className="text-sm text-slate-900 mt-1">{new Date(selectedOrder.due_date).toLocaleDateString()}</p>
-                    </div>
-                  )}
-                  {selectedOrder.specifications && (
-                    <div className="col-span-2">
-                      <p className="text-xs font-medium text-slate-600">Specifications</p>
-                      <p className="text-sm text-slate-900 mt-1">{selectedOrder.specifications}</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Manufacturing Timeline */}
-            <Card variant="default">
-              <CardHeader>
-                <CardTitle as="h4">Manufacturing Progress</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <OrderTimeline orderId={selectedOrder.id} />
-              </CardContent>
-            </Card>
-
-            <div className="flex justify-end space-x-3 mt-6">
-              <Button
-                variant="secondary"
-                onClick={() => setIsDetailModalOpen(false)}
-              >
-                Close
-              </Button>
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setIsDetailModalOpen(false)
-                  handleEditClick(selectedOrder)
-                }}
-              >
-                Edit Order
-              </Button>
-            </div>
-          </>
-        )}
-      </Modal>
     </Container>
   )
 }

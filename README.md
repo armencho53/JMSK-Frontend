@@ -179,49 +179,49 @@ Built files will be in the `dist/` directory.
 
 ## AWS Deployment
 
-### Recommended: GitHub Actions (Automated)
+### GitHub Actions (Automated CI/CD)
 
-The preferred deployment method is GitHub Actions workflows:
+The application uses GitHub Actions for automated deployment to AWS with environment-specific configurations.
 
 **Automatic Deployment:**
-- Push to `main` branch → Deploys after backend completion
-- Create pull request → Runs tests only
+- Push to `develop` → Deploys to development environment
+- Push to `staging` → Deploys to staging environment
+- Push to `main` → Deploys to production environment
+- Pull requests → Runs tests only (no deployment)
 
 **Manual Deployment:**
 ```bash
-# Deploy to specific environment (requires backend to be deployed first)
-gh workflow run deploy-frontend.yml -f environment=prod
-gh workflow run deploy-frontend.yml -f environment=staging
-gh workflow run deploy-frontend.yml -f environment=dev
+# Trigger deployment via GitHub UI or CLI
+gh workflow run deploy.yml -f environment=production
+gh workflow run deploy.yml -f environment=staging
+gh workflow run deploy.yml -f environment=development
 ```
 
-**Setup Requirements:**
-- AWS OIDC identity provider configured
-- GitHub repository secrets configured
-- Backend must be deployed first (provides API URL)
-- See [docs/deployment/deployment-guide.md](../docs/deployment/deployment-guide.md) for complete setup
+**Deployment Pipeline:**
+1. **Build**: Lint, test, and build application with environment-specific backend URL
+2. **Integration Test**: Verify backend connectivity and API integration
+3. **Deploy**: Upload to S3 and invalidate CloudFront cache
+4. **Smoke Test**: Post-deployment verification and health checks
+
+**Setup Documentation:**
+- **Quick Start**: [docs/github-secrets-setup.md](docs/github-secrets-setup.md) - Step-by-step secrets configuration
+- **Complete Guide**: [docs/github-actions-setup.md](docs/github-actions-setup.md) - Full deployment setup and troubleshooting
+- **AWS Infrastructure**: [aws-infrastructure/github-oidc-setup.yaml](aws-infrastructure/github-oidc-setup.yaml) - OIDC provider setup
+
+**Required Configuration:**
+- GitHub Secrets: `AWS_ROLE_ARN_DEV`, `AWS_ROLE_ARN_STAGE`, `AWS_ROLE_ARN_PROD`
+- GitHub Variables: Backend URLs, S3 bucket names, CloudFront IDs, Frontend URLs
+- AWS: OIDC provider, IAM roles, S3 buckets, CloudFront distributions (optional)
 
 ### Legacy: Manual Deployment (Deprecated)
 
 ⚠️ **Deprecated**: Manual deployment script is maintained for backup only.
 
-1. Ensure AWS credentials are configured:
-```bash
-aws configure
-```
-
-2. Deploy (with deprecation warnings):
 ```bash
 ./deploy.sh
 ```
 
-The script will:
-- Create S3 bucket and CloudFront distribution
-- Build the frontend with your API URL
-- Upload files to S3
-- Invalidate CloudFront cache
-
-**Migration Guide**: See [MIGRATION-GUIDE.md](../MIGRATION-GUIDE.md) for migrating to GitHub Actions.
+**Migration**: Use GitHub Actions for automated, secure, and auditable deployments.
 
 ## Environment Variables
 

@@ -62,6 +62,8 @@ export default function Modal({
     return () => {
       document.body.style.overflow = ''
     }
+    // modalRef is a ref and doesn't need to be in dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen])
 
   // Keyboard event handling
@@ -101,7 +103,7 @@ export default function Modal({
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, closeOnEscape, onClose])
+  }, [isOpen, closeOnEscape, onClose, modalRef])
 
   const handleBackdropClick = (event: React.MouseEvent) => {
     if (event.target === event.currentTarget && closeOnBackdropClick) {

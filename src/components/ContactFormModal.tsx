@@ -1,30 +1,25 @@
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import api from '../lib/api'
-import { Customer, Company } from '../types/customer'
+import { fetchCompanies } from '../lib/api'
+import { Contact } from '../types/contact'
 
-interface CustomerFormModalProps {
+interface ContactFormModalProps {
   isOpen: boolean
   onClose: () => void
   mode: 'create' | 'edit'
-  customer?: Customer | null
-  onSubmit: (data: {
-    name: string
-    email: string
-    phone?: string
-    company_id?: number
-  }) => void
+  contact?: Contact | null
+  onSubmit: (data: any) => void
   isSubmitting: boolean
 }
 
-export default function CustomerFormModal({
+export default function ContactFormModal({
   isOpen,
   onClose,
   mode,
-  customer,
+  contact,
   onSubmit,
   isSubmitting,
-}: CustomerFormModalProps) {
+}: ContactFormModalProps) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -35,21 +30,18 @@ export default function CustomerFormModal({
 
   const { data: companies } = useQuery({
     queryKey: ['companies'],
-    queryFn: async () => {
-      const response = await api.get('/companies/')
-      return response.data as Company[]
-    },
+    queryFn: () => fetchCompanies(),
     enabled: isOpen
   })
 
   useEffect(() => {
     if (isOpen) {
-      if (mode === 'edit' && customer) {
+      if (mode === 'edit' && contact) {
         setFormData({
-          name: customer.name,
-          email: customer.email,
-          phone: customer.phone || '',
-          company_id: customer.company_id?.toString() || '',
+          name: contact.name,
+          email: contact.email || '',
+          phone: contact.phone || '',
+          company_id: contact.company_id?.toString() || '',
         })
       } else {
         setFormData({
@@ -61,7 +53,7 @@ export default function CustomerFormModal({
       }
       setErrors({})
     }
-  }, [isOpen, mode, customer])
+  }, [isOpen, mode, contact])
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -81,9 +73,11 @@ export default function CustomerFormModal({
       newErrors.name = 'Name is required'
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required'
-    } else {
+    if (!formData.company_id) {
+      newErrors.company_id = 'Company is required'
+    }
+
+    if (formData.email && formData.email.trim()) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(formData.email)) {
         newErrors.email = 'Invalid email format'
@@ -103,9 +97,9 @@ export default function CustomerFormModal({
 
     const submitData: any = {
       name: formData.name.trim(),
-      email: formData.email.trim(),
+      company_id: parseInt(formData.company_id),
+      email: formData.email.trim() || undefined,
       phone: formData.phone.trim() || undefined,
-      company_id: formData.company_id ? parseInt(formData.company_id) : undefined,
     }
 
     onSubmit(submitData)
@@ -164,20 +158,20 @@ export default function CustomerFormModal({
                 className="text-lg leading-6 font-medium text-gray-900 mb-4"
                 id="modal-title"
               >
-                {mode === 'create' ? 'Create Customer' : 'Edit Customer'}
+                {mode === 'create' ? 'Create Contact' : 'Edit Contact'}
               </h3>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label
-                    htmlFor="customer-name"
+                    htmlFor="contact-name"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    id="customer-name"
+                    id="contact-name"
                     value={formData.name}
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
@@ -194,14 +188,43 @@ export default function CustomerFormModal({
 
                 <div>
                   <label
-                    htmlFor="customer-email"
+                    htmlFor="contact-company"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    Email <span className="text-red-500">*</span>
+                    Company <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="contact-company"
+                    value={formData.company_id}
+                    onChange={(e) =>
+                      setFormData({ ...formData, company_id: e.target.value })
+                    }
+                    className={`mt-1 block w-full border ${
+                      errors.company_id ? 'border-red-300' : 'border-gray-300'
+                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                  >
+                    <option value="">Select a company</option>
+                    {companies?.map((company) => (
+                      <option key={company.id} value={company.id}>
+                        {company.name}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.company_id && (
+                    <p className="mt-1 text-sm text-red-600">{errors.company_id}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="contact-email"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Email
                   </label>
                   <input
                     type="email"
-                    id="customer-email"
+                    id="contact-email"
                     value={formData.email}
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
@@ -218,14 +241,14 @@ export default function CustomerFormModal({
 
                 <div>
                   <label
-                    htmlFor="customer-phone"
+                    htmlFor="contact-phone"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Phone
                   </label>
                   <input
                     type="tel"
-                    id="customer-phone"
+                    id="contact-phone"
                     value={formData.phone}
                     onChange={(e) =>
                       setFormData({ ...formData, phone: e.target.value })
@@ -233,30 +256,6 @@ export default function CustomerFormModal({
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="+1 (555) 123-4567"
                   />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="customer-company"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Company
-                  </label>
-                  <select
-                    id="customer-company"
-                    value={formData.company_id}
-                    onChange={(e) =>
-                      setFormData({ ...formData, company_id: e.target.value })
-                    }
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  >
-                    <option value="">No company</option>
-                    {companies?.map((company) => (
-                      <option key={company.id} value={company.id}>
-                        {company.name}
-                      </option>
-                    ))}
-                  </select>
                 </div>
 
                 <div className="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
@@ -289,9 +288,9 @@ export default function CustomerFormModal({
                         {mode === 'create' ? 'Creating...' : 'Updating...'}
                       </>
                     ) : mode === 'create' ? (
-                      'Create Customer'
+                      'Create Contact'
                     ) : (
-                      'Update Customer'
+                      'Update Contact'
                     )}
                   </button>
                   <button

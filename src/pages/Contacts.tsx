@@ -1,23 +1,23 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import api from '../lib/api'
+import { fetchContacts, createContact, updateContact, deleteContact } from '../lib/api'
 import { showSuccessToast, showErrorToast } from '../lib/toast'
-import CustomerFormModal from '../components/CustomerFormModal'
+import ContactFormModal from '../components/ContactFormModal'
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal'
-import { Customer } from '../types/customer'
+import { Contact, ContactCreate, ContactUpdate } from '../types/contact'
 import { Card, CardContent } from '../components/ui/Card'
 import { Container } from '../components/ui/Container'
 import { Table, TableColumn } from '../components/ui/Table'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 
-// Define table columns for customers
-const getCustomerColumns = (
-  onEdit: (customer: Customer) => void,
-  onDelete: (customer: Customer) => void
-): TableColumn<Customer>[] => [
+// Define table columns for contacts
+const getContactColumns = (
+  onEdit: (contact: Contact) => void,
+  onDelete: (contact: Contact) => void
+): TableColumn<Contact>[] => [
   {
     key: 'name',
     title: 'Name',
@@ -33,7 +33,7 @@ const getCustomerColumns = (
     dataIndex: 'email',
     sortable: true,
     render: (value: string) => (
-      <span className="text-slate-600">{value}</span>
+      <span className="text-slate-600">{value || '-'}</span>
     )
   },
   {
@@ -44,15 +44,12 @@ const getCustomerColumns = (
     responsive: 'tablet'
   },
   {
-    key: 'balance',
-    title: 'Balance',
-    dataIndex: 'balance',
+    key: 'company',
+    title: 'Company',
+    dataIndex: 'company',
     sortable: true,
-    align: 'right' as const,
-    render: (value: number) => (
-      <span className={`font-medium ${value && value < 0 ? 'text-red-600' : 'text-slate-900'}`}>
-        ${value?.toFixed(2) || '0.00'}
-      </span>
+    render: (value: any) => (
+      <span className="text-slate-900">{value?.name || '-'}</span>
     )
   },
   {
@@ -60,7 +57,7 @@ const getCustomerColumns = (
     title: 'Actions',
     align: 'right' as const,
     width: 100,
-    render: (_, record: Customer) => (
+    render: (_, record: Contact) => (
       <div className="flex space-x-2">
         <button
           onClick={(e) => {
@@ -68,7 +65,7 @@ const getCustomerColumns = (
             onEdit(record);
           }}
           className="text-indigo-600 hover:text-slate-900"
-          title="Edit customer"
+          title="Edit contact"
         >
           Edit
         </button>
@@ -78,7 +75,7 @@ const getCustomerColumns = (
             onDelete(record);
           }}
           className="text-red-600 hover:text-red-900"
-          title="Delete customer"
+          title="Delete contact"
         >
           Delete
         </button>
@@ -87,134 +84,115 @@ const getCustomerColumns = (
   }
 ]
 
-export default function Customers() {
+export default function Contacts() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [customerToEdit, setCustomerToEdit] = useState<Customer | null>(null)
-  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null)
+  const [contactToEdit, setContactToEdit] = useState<Contact | null>(null)
+  const [contactToDelete, setContactToDelete] = useState<Contact | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
-  const { data: customers, isLoading, error } = useQuery({
-    queryKey: ['customers', searchQuery],
-    queryFn: async () => {
-      const params = searchQuery ? `?search=${encodeURIComponent(searchQuery)}` : ''
-      const response = await api.get(`/customers/${params}`)
-      return response.data as Customer[]
-    }
+  // Set document title (Requirement 7.1)
+  useEffect(() => {
+    document.title = 'Contacts - JMSK'
+  }, [])
+
+  const { data: contacts, isLoading, error } = useQuery({
+    queryKey: ['contacts', searchQuery],
+    queryFn: () => fetchContacts()
   })
 
-  const createCustomerMutation = useMutation({
-    mutationFn: async (data: {
-      name: string
-      email: string
-      phone?: string
-      company_id?: number
-    }) => {
-      const response = await api.post('/customers/', data)
-      return response.data
-    },
+  const createContactMutation = useMutation({
+    mutationFn: (data: ContactCreate) => createContact(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] })
-      showSuccessToast('Customer created successfully')
+      queryClient.invalidateQueries({ queryKey: ['contacts'] })
+      showSuccessToast('Contact created successfully')
       setIsCreateModalOpen(false)
     },
     onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Failed to create customer'
+      const message = error.response?.data?.detail || 'Failed to create contact'
       showErrorToast(message)
     }
   })
 
-  const updateCustomerMutation = useMutation({
-    mutationFn: async ({ id, data }: { 
-      id: number
-      data: {
-        name?: string
-        email?: string
-        phone?: string
-        company_id?: number
-      }
-    }) => {
-      const response = await api.put(`/customers/${id}`, data)
-      return response.data
-    },
+  const updateContactMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: ContactUpdate }) => 
+      updateContact(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] })
-      showSuccessToast('Customer updated successfully')
+      queryClient.invalidateQueries({ queryKey: ['contacts'] })
+      showSuccessToast('Contact updated successfully')
       setIsEditModalOpen(false)
-      setCustomerToEdit(null)
+      setContactToEdit(null)
     },
     onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Failed to update customer'
+      const message = error.response?.data?.detail || 'Failed to update contact'
       showErrorToast(message)
     }
   })
 
-  const deleteCustomerMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await api.delete(`/customers/${id}`)
-      return response.data
-    },
+  const deleteContactMutation = useMutation({
+    mutationFn: (id: number) => deleteContact(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customers'] })
-      showSuccessToast('Customer deleted successfully')
+      queryClient.invalidateQueries({ queryKey: ['contacts'] })
+      showSuccessToast('Contact deleted successfully')
       setIsDeleteModalOpen(false)
-      setCustomerToDelete(null)
+      setContactToDelete(null)
     },
     onError: (error: any) => {
-      const message = error.response?.data?.detail || 'Failed to delete customer'
+      const message = error.response?.data?.detail || 'Failed to delete contact'
       showErrorToast(message)
     }
   })
 
-  const handleCreateCustomer = (data: {
-    name: string
-    email: string
-    phone?: string
-    company_id?: number
-  }) => {
-    createCustomerMutation.mutate(data)
+  const handleCreateContact = (data: ContactCreate) => {
+    createContactMutation.mutate(data)
   }
 
-  const handleEditClick = (customer: Customer) => {
-    setCustomerToEdit(customer)
+  const handleEditClick = (contact: Contact) => {
+    setContactToEdit(contact)
     setIsEditModalOpen(true)
   }
 
-  const handleUpdateCustomer = (data: {
-    name?: string
-    email?: string
-    phone?: string
-    company_id?: number
-  }) => {
-    if (customerToEdit) {
-      updateCustomerMutation.mutate({
-        id: customerToEdit.id,
+  const handleUpdateContact = (data: ContactUpdate) => {
+    if (contactToEdit) {
+      updateContactMutation.mutate({
+        id: contactToEdit.id,
         data
       })
     }
   }
 
-  const handleDeleteClick = (customer: Customer) => {
-    setCustomerToDelete(customer)
+  const handleDeleteClick = (contact: Contact) => {
+    setContactToDelete(contact)
     setIsDeleteModalOpen(true)
   }
 
   const handleConfirmDelete = () => {
-    if (customerToDelete) {
-      deleteCustomerMutation.mutate(customerToDelete.id)
+    if (contactToDelete) {
+      deleteContactMutation.mutate(contactToDelete.id)
     }
   }
 
-  const handleRowClick = (customerId: number) => {
-    navigate(`/customers/${customerId}`)
+  const handleRowClick = (contactId: number) => {
+    navigate(`/contacts/${contactId}`)
   }
 
+  // Filter contacts by search query
+  const filteredContacts = contacts?.filter(contact => {
+    if (!searchQuery) return true
+    const query = searchQuery.toLowerCase()
+    return (
+      contact.name.toLowerCase().includes(query) ||
+      contact.email?.toLowerCase().includes(query) ||
+      contact.company?.name?.toLowerCase().includes(query)
+    )
+  })
+
   // Define table columns
-  const columns = getCustomerColumns(handleEditClick, handleDeleteClick);
+  const columns = getContactColumns(handleEditClick, handleDeleteClick);
 
   if (isLoading) {
     return (
@@ -222,7 +200,7 @@ export default function Customers() {
         <Card variant="default">
           <CardContent className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-slate-900"></div>
-            <p className="mt-2 text-slate-600">Loading customers...</p>
+            <p className="mt-2 text-slate-600">Loading contacts...</p>
           </CardContent>
         </Card>
       </Container>
@@ -234,7 +212,7 @@ export default function Customers() {
       <Container size="full" padding="md">
         <Card variant="outlined" className="border-red-200 bg-red-50">
           <CardContent>
-            <p className="text-red-800">Error loading customers. Please try again.</p>
+            <p className="text-red-800">Error loading contacts. Please try again.</p>
           </CardContent>
         </Card>
       </Container>
@@ -246,12 +224,12 @@ export default function Customers() {
       <Toaster />
       
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold text-slate-900">Customers</h1>
+        <h1 className="text-2xl font-semibold text-slate-900">Contacts</h1>
         <Button 
           onClick={() => setIsCreateModalOpen(true)}
           variant="primary"
         > 
-          Create Customer
+          Create Contact
         </Button>
       </div>
 
@@ -268,11 +246,11 @@ export default function Customers() {
       <Card variant="elevated">
         <Table
           columns={columns}
-          data={customers || []}
+          data={filteredContacts || []}
           loading={isLoading}
           hoverable
           responsive
-          emptyText="No customers found. Create your first customer to get started."
+          emptyText="No contacts found. Create your first contact to get started."
           onRow={(record) => ({
             onClick: () => handleRowClick(record.id),
             className: 'cursor-pointer'
@@ -280,36 +258,36 @@ export default function Customers() {
         />
       </Card>
 
-      <CustomerFormModal
+      <ContactFormModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         mode="create"
-        onSubmit={handleCreateCustomer}
-        isSubmitting={createCustomerMutation.isPending}
+        onSubmit={handleCreateContact}
+        isSubmitting={createContactMutation.isPending}
       />
 
-      <CustomerFormModal
+      <ContactFormModal
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false)
-          setCustomerToEdit(null)
+          setContactToEdit(null)
         }}
         mode="edit"
-        customer={customerToEdit}
-        onSubmit={handleUpdateCustomer}
-        isSubmitting={updateCustomerMutation.isPending}
+        contact={contactToEdit}
+        onSubmit={handleUpdateContact}
+        isSubmitting={updateContactMutation.isPending}
       />
 
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
         onClose={() => {
           setIsDeleteModalOpen(false)
-          setCustomerToDelete(null)
+          setContactToDelete(null)
         }}
-        itemName={customerToDelete?.name || ''}
-        itemType="Customer"
+        itemName={contactToDelete?.name || ''}
+        itemType="Contact"
         onConfirm={handleConfirmDelete}
-        isDeleting={deleteCustomerMutation.isPending}
+        isDeleting={deleteContactMutation.isPending}
       />
     </Container>
   )

@@ -1,21 +1,23 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import api from '../lib/api'
+import { fetchCompanies, createCompany, updateCompany, deleteCompany } from '../lib/api'
 import { showSuccessToast, showErrorToast } from '../lib/toast'
 import CompanyFormModal from '../components/CompanyFormModal'
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal'
-import { Company } from '../types/customer'
+import { CompanyCreate, CompanyUpdate, CompanyWithContacts } from '../types/company'
 import { Card, CardContent } from '../components/ui/Card'
 import { Container } from '../components/ui/Container'
 import { Table, TableColumn } from '../components/ui/Table'
 import { Button } from '../components/ui/Button'
+import { Input } from '../components/ui/Input'
 
 // Define table columns for companies
 const getCompanyColumns = (
-  onEdit: (company: Company) => void,
-  onDelete: (company: Company) => void
-): TableColumn<Company>[] => [
+  onEdit: (company: CompanyWithContacts) => void,
+  onDelete: (company: CompanyWithContacts) => void
+): TableColumn<CompanyWithContacts>[] => [
   {
     key: 'name',
     title: 'Name',
@@ -26,10 +28,13 @@ const getCompanyColumns = (
     )
   },
   {
-    key: 'address',
-    title: 'Address',
-    dataIndex: 'address',
-    render: (value: string) => value || '-',
+    key: 'email',
+    title: 'Email',
+    dataIndex: 'email',
+    sortable: true,
+    render: (value: string) => (
+      <span className="text-slate-600">{value || '-'}</span>
+    ),
     responsive: 'tablet'
   },
   {
@@ -40,18 +45,31 @@ const getCompanyColumns = (
     responsive: 'desktop'
   },
   {
-    key: 'email',
-    title: 'Email',
-    dataIndex: 'email',
-    render: (value: string) => value || '-',
-    responsive: 'desktop'
+    key: 'contact_count',
+    title: 'Contacts',
+    align: 'center' as const,
+    render: (_, record: CompanyWithContacts) => (
+      <span className="text-slate-900">{record.contacts?.length || 0}</span>
+    )
+  },
+  {
+    key: 'total_balance',
+    title: 'Balance',
+    dataIndex: 'total_balance',
+    sortable: true,
+    align: 'right' as const,
+    render: (value: number) => (
+      <span className={`font-medium ${value && value < 0 ? 'text-red-600' : 'text-slate-900'}`}>
+        ${value?.toFixed(2) || '0.00'}
+      </span>
+    )
   },
   {
     key: 'actions',
     title: 'Actions',
     align: 'right' as const,
     width: 100,
-    render: (_, record: Company) => (
+    render: (_, record: CompanyWithContacts) => (
       <div className="flex space-x-2">
         <button
           onClick={(e) => {
@@ -82,29 +100,25 @@ export default function Companies() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
-  const [companyToEdit, setCompanyToEdit] = useState<Company | null>(null)
-  const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null)
+  const [companyToEdit, setCompanyToEdit] = useState<CompanyWithContacts | null>(null)
+  const [companyToDelete, setCompanyToDelete] = useState<CompanyWithContacts | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
+
+  // Set document title (Requirement 7.1)
+  useEffect(() => {
+    document.title = 'Companies - JMSK'
+  }, [])
 
   const { data: companies, isLoading, error } = useQuery({
-    queryKey: ['companies'],
-    queryFn: async () => {
-      const response = await api.get('/companies/')
-      return response.data as Company[]
-    }
+    queryKey: ['companies', searchQuery],
+    queryFn: () => fetchCompanies() as Promise<CompanyWithContacts[]>
   })
 
   const createCompanyMutation = useMutation({
-    mutationFn: async (data: {
-      name: string
-      address?: string
-      phone?: string
-      email?: string
-    }) => {
-      const response = await api.post('/companies/', data)
-      return response.data
-    },
+    mutationFn: (data: CompanyCreate) => createCompany(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] })
       showSuccessToast('Company created successfully')
@@ -117,18 +131,8 @@ export default function Companies() {
   })
 
   const updateCompanyMutation = useMutation({
-    mutationFn: async ({ id, data }: { 
-      id: number
-      data: {
-        name?: string
-        address?: string
-        phone?: string
-        email?: string
-      }
-    }) => {
-      const response = await api.put(`/companies/${id}`, data)
-      return response.data
-    },
+    mutationFn: ({ id, data }: { id: number; data: CompanyUpdate }) => 
+      updateCompany(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] })
       showSuccessToast('Company updated successfully')
@@ -142,10 +146,7 @@ export default function Companies() {
   })
 
   const deleteCompanyMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await api.delete(`/companies/${id}`)
-      return response.data
-    },
+    mutationFn: (id: number) => deleteCompany(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companies'] })
       showSuccessToast('Company deleted successfully')
@@ -158,26 +159,16 @@ export default function Companies() {
     }
   })
 
-  const handleCreateCompany = (data: {
-    name: string
-    address?: string
-    phone?: string
-    email?: string
-  }) => {
+  const handleCreateCompany = (data: CompanyCreate) => {
     createCompanyMutation.mutate(data)
   }
 
-  const handleEditClick = (company: Company) => {
+  const handleEditClick = (company: CompanyWithContacts) => {
     setCompanyToEdit(company)
     setIsEditModalOpen(true)
   }
 
-  const handleUpdateCompany = (data: {
-    name?: string
-    address?: string
-    phone?: string
-    email?: string
-  }) => {
+  const handleUpdateCompany = (data: CompanyUpdate) => {
     if (companyToEdit) {
       updateCompanyMutation.mutate({
         id: companyToEdit.id,
@@ -186,7 +177,7 @@ export default function Companies() {
     }
   }
 
-  const handleDeleteClick = (company: Company) => {
+  const handleDeleteClick = (company: CompanyWithContacts) => {
     setCompanyToDelete(company)
     setIsDeleteModalOpen(true)
   }
@@ -196,6 +187,20 @@ export default function Companies() {
       deleteCompanyMutation.mutate(companyToDelete.id)
     }
   }
+
+  const handleRowClick = (companyId: number) => {
+    navigate(`/companies/${companyId}`)
+  }
+
+  // Filter companies by search query
+  const filteredCompanies = companies?.filter(company => {
+    if (!searchQuery) return true
+    const query = searchQuery.toLowerCase()
+    return (
+      company.name.toLowerCase().includes(query) ||
+      company.email?.toLowerCase().includes(query)
+    )
+  })
 
   // Define table columns
   const columns = getCompanyColumns(handleEditClick, handleDeleteClick);
@@ -234,19 +239,33 @@ export default function Companies() {
         <Button 
           onClick={() => setIsCreateModalOpen(true)}
           variant="primary"
-        >
+        > 
           Create Company
         </Button>
+      </div>
+
+      <div className="mb-4">
+        <Input
+          type="text"
+          placeholder="Search by name or email..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full"
+        />
       </div>
       
       <Card variant="elevated">
         <Table
           columns={columns}
-          data={companies || []}
+          data={filteredCompanies || []}
           loading={isLoading}
           hoverable
           responsive
-          emptyText="No companies yet. Create your first company to get started."
+          emptyText="No companies found. Create your first company to get started."
+          onRow={(record) => ({
+            onClick: () => handleRowClick(record.id),
+            className: 'cursor-pointer'
+          })}
         />
       </Card>
 

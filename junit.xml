@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="7" failures="0" errors="0" time="0.664">
-  <testsuite name="API Configuration" errors="0" failures="0" skipped="0" timestamp="2026-01-22T19:40:14" time="0.163" tests="2">
-    <testcase classname="API Configuration axios create should be called" name="API Configuration axios create should be called" time="0.002">
+<testsuites name="jest tests" tests="4" failures="0" errors="0" time="0.392">
+  <testsuite name="App Component" errors="0" failures="0" skipped="0" timestamp="2026-02-07T01:51:45" time="0.118" tests="2">
+    <testcase classname="App Component can be imported without errors" name="App Component can be imported without errors" time="0.036">
+    </testcase>
+    <testcase classname="App Component basic component structure exists" name="App Component basic component structure exists" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="API Configuration" errors="0" failures="0" skipped="0" timestamp="2026-02-07T01:51:45" time="0.038" tests="2">
+    <testcase classname="API Configuration axios create should be called" name="API Configuration axios create should be called" time="0">
     </testcase>
     <testcase classname="API Configuration api client configuration is testable" name="API Configuration api client configuration is testable" time="0.001">
-    </testcase>
-  </testsuite>
-  <testsuite name="App Component" errors="0" failures="0" skipped="0" timestamp="2026-01-22T19:40:14" time="0.199" tests="2">
-    <testcase classname="App Component can be imported without errors" name="App Component can be imported without errors" time="0.031">
-    </testcase>
-    <testcase classname="App Component basic component structure exists" name="App Component basic component structure exists" time="0">
-    </testcase>
-  </testsuite>
-  <testsuite name="Layout Component" errors="0" failures="0" skipped="0" timestamp="2026-01-22T19:40:14" time="0.248" tests="3">
-    <testcase classname="Layout Component renders layout structure" name="Layout Component renders layout structure" time="0.041">
-    </testcase>
-    <testcase classname="Layout Component renders navigation elements" name="Layout Component renders navigation elements" time="0.003">
-    </testcase>
-    <testcase classname="Layout Component renders children content through Outlet" name="Layout Component renders children content through Outlet" time="0.002">
     </testcase>
   </testsuite>
 </testsuites>
