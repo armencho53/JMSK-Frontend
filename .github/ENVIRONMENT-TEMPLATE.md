@@ -156,6 +156,7 @@ BACKEND_URL_PROD=https://ewzlv276yh.execute-api.us-east-1.amazonaws.com/Prod
 FRONTEND_URL_PROD=
 ```
 
+
 ## Security Notes
 
 ⚠️ **IMPORTANT**:
