@@ -114,7 +114,7 @@ export default function ManufacturingFormModal({
   } | null>(null)
 
   // Fetch orders for the dropdown
-  const { data: orders = [] } = useQuery<Order[]>({
+  const { data: orders = [] } = useQuery<Order[]>({ 
     queryKey: ['orders'],
     queryFn: async () => {
       const { data } = await api.get('/orders/')
@@ -294,8 +294,9 @@ export default function ManufacturingFormModal({
           &#8203;
         </span>
 
-        <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-6">
-          <div className="mb-4">
+        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+          {/* Modal Header with Border */}
+          <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
               {mode === 'create' ? 'Create Manufacturing Step' : mode === 'transfer' ? 'Transfer Items' : 'Edit Manufacturing Step'}
             </h3>
@@ -306,137 +307,153 @@ export default function ManufacturingFormModal({
             )}
           </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="space-y-4">
+          {/* Modal Body */}
+          <div className="px-6 py-4 max-h-[calc(100vh-16rem)] overflow-y-auto">
+            <form onSubmit={handleSubmit}>
+              <div className="space-y-4">
               {/* Transfer Mode Form */}
               {mode === 'transfer' && (
                 <>
-                  {/* Remaining Quantities Info */}
+                  {/* Remaining Quantities Summary Card */}
                   {remaining && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-                      <p className="text-sm font-medium text-blue-900">Available to Transfer:</p>
-                      <div className="mt-1 grid grid-cols-2 gap-2">
-                        <p className="text-sm text-blue-700">
-                          Quantity: <span className="font-semibold">{remaining.quantity}</span> pieces
-                        </p>
-                        <p className="text-sm text-blue-700">
-                          Weight: <span className="font-semibold">{remaining.weight}g</span>
-                        </p>
-                      </div>
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-3">Available to Transfer</h4>
+                      <dl className="grid grid-cols-2 gap-4">
+                        <div>
+                          <dt className="text-xs text-gray-500 uppercase tracking-wide">Quantity</dt>
+                          <dd className="mt-1 text-lg font-semibold text-gray-900">{remaining.quantity} <span className="text-sm font-normal text-gray-600">pieces</span></dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-gray-500 uppercase tracking-wide">Weight</dt>
+                          <dd className="mt-1 text-lg font-semibold text-gray-900">{remaining.weight}<span className="text-sm font-normal text-gray-600">g</span></dd>
+                        </div>
+                      </dl>
                     </div>
                   )}
 
-                  {/* Transfer Quantity and Weight */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="transfer_quantity" className="block text-sm font-medium text-gray-700">
-                        Transfer Quantity <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        id="transfer_quantity"
-                        value={transferData.quantity || ''}
-                        onChange={(e) => setTransferData({ ...transferData, quantity: parseFloat(e.target.value) || 0 })}
-                        className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                          errors.quantity ? 'border-red-500' : ''
-                        }`}
-                        placeholder="e.g., 5"
-                      />
-                      {errors.quantity && (
-                        <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label htmlFor="transfer_weight" className="block text-sm font-medium text-gray-700">
-                        Transfer Weight (g) <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        id="transfer_weight"
-                        value={transferData.weight || ''}
-                        onChange={(e) => setTransferData({ ...transferData, weight: parseFloat(e.target.value) || 0 })}
-                        className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                          errors.weight ? 'border-red-500' : ''
-                        }`}
-                        placeholder="e.g., 50.0"
-                      />
-                      {errors.weight && (
-                        <p className="mt-1 text-sm text-red-600">{errors.weight}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Next Step Type */}
+                  {/* Transfer Amounts Section */}
                   <div>
-                    <label htmlFor="next_step_type" className="block text-sm font-medium text-gray-700">
-                      Next Step Type <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      id="next_step_type"
-                      value={transferData.next_step_type}
-                      onChange={(e) => setTransferData({ ...transferData, next_step_type: e.target.value })}
-                      className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                        errors.next_step_type ? 'border-red-500' : ''
-                      }`}
-                    >
-                      <option value="">Select next step type</option>
-                      {stepTypeOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.next_step_type && (
-                      <p className="mt-1 text-sm text-red-600">{errors.next_step_type}</p>
-                    )}
+                    <h4 className="text-sm font-medium text-gray-900 mb-3">Transfer Amounts</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="transfer_quantity" className="block text-sm font-medium text-gray-700">
+                          Quantity <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          id="transfer_quantity"
+                          value={transferData.quantity || ''}
+                          onChange={(e) => setTransferData({ ...transferData, quantity: parseFloat(e.target.value) || 0 })}
+                          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                            errors.quantity ? 'border-red-500' : ''
+                          }`}
+                          placeholder="e.g., 5"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">Number of pieces to transfer</p>
+                        {errors.quantity && (
+                          <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label htmlFor="transfer_weight" className="block text-sm font-medium text-gray-700">
+                          Weight (g) <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          id="transfer_weight"
+                          value={transferData.weight || ''}
+                          onChange={(e) => setTransferData({ ...transferData, weight: parseFloat(e.target.value) || 0 })}
+                          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                            errors.weight ? 'border-red-500' : ''
+                          }`}
+                          placeholder="e.g., 50.0"
+                        />
+                        <p className="mt-1 text-xs text-gray-500">Total weight in grams</p>
+                        {errors.weight && (
+                          <p className="mt-1 text-sm text-red-600">{errors.weight}</p>
+                        )}
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Receiving Department and Received By */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="transfer_department" className="block text-sm font-medium text-gray-700">
-                        Receiving Department <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        id="transfer_department"
-                        value={transferData.department || ''}
-                        onChange={(e) => setTransferData({ ...transferData, department: e.target.value })}
-                        className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                          errors.department ? 'border-red-500' : ''
-                        }`}
-                      >
-                        <option value="">Select receiving department</option>
-                        {departments.map((dept) => (
-                          <option key={dept.id} value={dept.name}>
-                            {dept.name}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.department && (
-                        <p className="mt-1 text-sm text-red-600">{errors.department}</p>
-                      )}
-                    </div>
+                  {/* Destination Section */}
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-900 mb-3">Destination</h4>
+                    <div className="space-y-4">
+                      <div>
+                        <label htmlFor="next_step_type" className="block text-sm font-medium text-gray-700">
+                          Next Step Type <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          id="next_step_type"
+                          value={transferData.next_step_type}
+                          onChange={(e) => setTransferData({ ...transferData, next_step_type: e.target.value })}
+                          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                            errors.next_step_type ? 'border-red-500' : ''
+                          }`}
+                        >
+                          <option value="">Select next step type</option>
+                          {stepTypeOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="mt-1 text-xs text-gray-500">Manufacturing step to transfer to</p>
+                        {errors.next_step_type && (
+                          <p className="mt-1 text-sm text-red-600">{errors.next_step_type}</p>
+                        )}
+                      </div>
 
-                    <div>
-                      <label htmlFor="received_by" className="block text-sm font-medium text-gray-700">
-                        Received By (Worker) <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        id="received_by"
-                        value={transferData.received_by}
-                        onChange={(e) => setTransferData({ ...transferData, received_by: e.target.value })}
-                        className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                          errors.received_by ? 'border-red-500' : ''
-                        }`}
-                        placeholder="Worker name"
-                      />
-                      {errors.received_by && (
-                        <p className="mt-1 text-sm text-red-600">{errors.received_by}</p>
-                      )}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label htmlFor="transfer_department" className="block text-sm font-medium text-gray-700">
+                            Department <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            id="transfer_department"
+                            value={transferData.department || ''}
+                            onChange={(e) => setTransferData({ ...transferData, department: e.target.value })}
+                            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                              errors.department ? 'border-red-500' : ''
+                            }`}
+                          >
+                            <option value="">Select department</option>
+                            {departments.map((dept) => (
+                              <option key={dept.id} value={dept.name}>
+                                {dept.name}
+                              </option>
+                            ))}
+                          </select>
+                          <p className="mt-1 text-xs text-gray-500">Receiving department</p>
+                          {errors.department && (
+                            <p className="mt-1 text-sm text-red-600">{errors.department}</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label htmlFor="received_by" className="block text-sm font-medium text-gray-700">
+                            Received By <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            id="received_by"
+                            value={transferData.received_by}
+                            onChange={(e) => setTransferData({ ...transferData, received_by: e.target.value })}
+                            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                              errors.received_by ? 'border-red-500' : ''
+                            }`}
+                            placeholder="Worker name"
+                          />
+                          <p className="mt-1 text-xs text-gray-500">Worker receiving items</p>
+                          {errors.received_by && (
+                            <p className="mt-1 text-sm text-red-600">{errors.received_by}</p>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -445,133 +462,144 @@ export default function ManufacturingFormModal({
               {/* Create/Edit Mode Form */}
               {mode !== 'transfer' && (
                 <>
-              {/* Order Selection */}
+              {/* Basic Information Section */}
               <div>
-                <label htmlFor="order_id" className="block text-sm font-medium text-gray-700">
-                  Order <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="order_id"
-                  value={formData.order_id}
-                  onChange={(e) => setFormData({ ...formData, order_id: parseInt(e.target.value) })}
-                  disabled={mode === 'edit'}
-                  className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                    errors.order_id ? 'border-red-500' : ''
-                  } ${mode === 'edit' ? 'bg-gray-100' : ''}`}
-                >
-                  <option value={0}>Select an order</option>
-                  {orders.map((order) => (
-                    <option key={order.id} value={order.id}>
-                      {order.order_number} - {order.contact_name || "Unknown"}
-                    </option>
-                  ))}
-                </select>
-                {errors.order_id && (
-                  <p className="mt-1 text-sm text-red-600">{errors.order_id}</p>
-                )}
-              </div>
+                <h4 className="text-sm font-medium text-gray-900 mb-3">Basic Information</h4>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="order_id" className="block text-sm font-medium text-gray-700">
+                      Order <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="order_id"
+                      value={formData.order_id}
+                      onChange={(e) => setFormData({ ...formData, order_id: parseInt(e.target.value) })}
+                      disabled={mode === 'edit'}
+                      className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                        errors.order_id ? 'border-red-500' : ''
+                      } ${mode === 'edit' ? 'bg-gray-100' : ''}`}
+                    >
+                      <option value={0}>Select an order</option>
+                      {orders.map((order) => (
+                        <option key={order.id} value={order.id}>
+                          {order.order_number} - {order.contact_name || "Unknown"}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="mt-1 text-xs text-gray-500">Order this step belongs to</p>
+                    {errors.order_id && (
+                      <p className="mt-1 text-sm text-red-600">{errors.order_id}</p>
+                    )}
+                  </div>
 
-              {/* Step Type */}
-              <div>
-                <label htmlFor="step_type" className="block text-sm font-medium text-gray-700">
-                  Step Type <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="step_type"
-                  value={formData.step_type}
-                  onChange={(e) => setFormData({ ...formData, step_type: e.target.value })}
-                  className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                    errors.step_type ? 'border-red-500' : ''
-                  }`}
-                >
-                  <option value="">Select a step type</option>
-                  {stepTypeOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                {errors.step_type && (
-                  <p className="mt-1 text-sm text-red-600">{errors.step_type}</p>
-                )}
-              </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="step_type" className="block text-sm font-medium text-gray-700">
+                        Step Type <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        id="step_type"
+                        value={formData.step_type}
+                        onChange={(e) => setFormData({ ...formData, step_type: e.target.value })}
+                        className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                          errors.step_type ? 'border-red-500' : ''
+                        }`}
+                      >
+                        <option value="">Select step type</option>
+                        {stepTypeOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="mt-1 text-xs text-gray-500">Type of manufacturing step</p>
+                      {errors.step_type && (
+                        <p className="mt-1 text-sm text-red-600">{errors.step_type}</p>
+                      )}
+                    </div>
 
-              {/* Description */}
-              <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  rows={3}
-                  value={formData.description || ''}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  placeholder="Additional details about this step..."
-                />
-              </div>
+                    {mode === 'edit' && (
+                      <div>
+                        <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+                          Status
+                        </label>
+                        <select
+                          id="status"
+                          value={formData.status || 'IN_PROGRESS'}
+                          onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        >
+                          {statusOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="mt-1 text-xs text-gray-500">Current step status</p>
+                      </div>
+                    )}
+                  </div>
 
-              {/* Department and Worker Row */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* Department Dropdown */}
-                <div>
-                  <label htmlFor="department" className="block text-sm font-medium text-gray-700">
-                    Department
-                  </label>
-                  <select
-                    id="department"
-                    value={formData.department || ''}
-                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  >
-                    <option value="">Select department</option>
-                    {departments.map((dept) => (
-                      <option key={dept.id} value={dept.name}>
-                        {dept.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Worker Name */}
-                <div>
-                  <label htmlFor="worker_name" className="block text-sm font-medium text-gray-700">
-                    Worker Name
-                  </label>
-                  <input
-                    type="text"
-                    id="worker_name"
-                    value={formData.worker_name || ''}
-                    onChange={(e) => setFormData({ ...formData, worker_name: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    placeholder="Worker name"
-                  />
+                  <div>
+                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                      Description
+                    </label>
+                    <textarea
+                      id="description"
+                      rows={3}
+                      value={formData.description || ''}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      placeholder="Additional details about this step..."
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Optional details or specifications</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Status (edit mode only) */}
-              {mode === 'edit' && (
-                <div>
-                  <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                    Status
-                  </label>
-                  <select
-                    id="status"
-                    value={formData.status || 'IN_PROGRESS'}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  >
-                    {statusOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+              {/* Assignment Section */}
+              <div>
+                <h4 className="text-sm font-medium text-gray-900 mb-3">Assignment</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="department" className="block text-sm font-medium text-gray-700">
+                      Department
+                    </label>
+                    <select
+                      id="department"
+                      value={formData.department || ''}
+                      onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    >
+                      <option value="">Select department</option>
+                      {departments.map((dept) => (
+                        <option key={dept.id} value={dept.name}>
+                          {dept.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="mt-1 text-xs text-gray-500">Department handling this step</p>
+                  </div>
 
-              {/* Quantity Tracking */}
-              <div className="border-t pt-4 mt-4">
+                  <div>
+                    <label htmlFor="worker_name" className="block text-sm font-medium text-gray-700">
+                      Worker Name
+                    </label>
+                    <input
+                      type="text"
+                      id="worker_name"
+                      value={formData.worker_name || ''}
+                      onChange={(e) => setFormData({ ...formData, worker_name: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      placeholder="Worker name"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Assigned worker</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quantity Tracking Section */}
+              <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-3">Quantity Tracking</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -587,6 +615,7 @@ export default function ManufacturingFormModal({
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                       placeholder="e.g., 10"
                     />
+                    <p className="mt-1 text-xs text-gray-500">Pieces received at this step</p>
                   </div>
                   {mode === 'edit' && (
                     <div>
@@ -602,49 +631,54 @@ export default function ManufacturingFormModal({
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         placeholder="e.g., 9"
                       />
+                      <p className="mt-1 text-xs text-gray-500">Pieces completed/returned</p>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Weight Tracking */}
-              <div className="border-t pt-4">
+              {/* Weight Tracking Section */}
+              <div>
                 <h4 className="text-sm font-medium text-gray-900 mb-3">Weight Tracking</h4>
-                <div>
-                  <label htmlFor="weight_received" className="block text-sm font-medium text-gray-700">
-                    Weight Received (g)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    id="weight_received"
-                    value={formData.weight_received || ''}
-                    onChange={(e) => setFormData({ ...formData, weight_received: e.target.value ? parseFloat(e.target.value) : undefined })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    placeholder="e.g., 90.0"
-                  />
-                </div>
-                {mode === 'edit' && (
-                  <div className="mt-3">
-                    <label htmlFor="weight_returned" className="block text-sm font-medium text-gray-700">
-                      Weight Returned (g)
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="weight_received" className="block text-sm font-medium text-gray-700">
+                      Weight Received (g)
                     </label>
                     <input
                       type="number"
                       step="0.01"
-                      id="weight_returned"
-                      value={formData.weight_returned || ''}
-                      onChange={(e) => setFormData({ ...formData, weight_returned: e.target.value ? parseFloat(e.target.value) : undefined })}
+                      id="weight_received"
+                      value={formData.weight_received || ''}
+                      onChange={(e) => setFormData({ ...formData, weight_received: e.target.value ? parseFloat(e.target.value) : undefined })}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      placeholder="e.g., 88.2"
+                      placeholder="e.g., 90.0"
                     />
+                    <p className="mt-1 text-xs text-gray-500">Initial weight in grams</p>
                   </div>
-                )}
+                  {mode === 'edit' && (
+                    <div>
+                      <label htmlFor="weight_returned" className="block text-sm font-medium text-gray-700">
+                        Weight Returned (g)
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="weight_returned"
+                        value={formData.weight_returned || ''}
+                        onChange={(e) => setFormData({ ...formData, weight_returned: e.target.value ? parseFloat(e.target.value) : undefined })}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="e.g., 88.2"
+                      />
+                      <p className="mt-1 text-xs text-gray-500">Final weight after processing</p>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Transfer Tracking (edit mode) */}
+              {/* Transfer Tracking Section (edit mode) */}
               {mode === 'edit' && (
-                <div className="border-t pt-4">
+                <div>
                   <h4 className="text-sm font-medium text-gray-900 mb-3">Transfer Tracking</h4>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -659,6 +693,7 @@ export default function ManufacturingFormModal({
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         placeholder="Worker who sent"
                       />
+                      <p className="mt-1 text-xs text-gray-500">Worker who sent items</p>
                     </div>
                     <div>
                       <label htmlFor="received_by" className="block text-sm font-medium text-gray-700">
@@ -672,33 +707,41 @@ export default function ManufacturingFormModal({
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         placeholder="Worker who received"
                       />
+                      <p className="mt-1 text-xs text-gray-500">Worker who received items</p>
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Notes (edit mode only) */}
+              {/* Notes Section (edit mode only) */}
               {mode === 'edit' && (
                 <div>
-                  <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
-                    Notes
-                  </label>
-                  <textarea
-                    id="notes"
-                    rows={3}
-                    value={formData.notes || ''}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                    placeholder="Additional notes or observations..."
-                  />
+                  <h4 className="text-sm font-medium text-gray-900 mb-3">Additional Notes</h4>
+                  <div>
+                    <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
+                      Notes
+                    </label>
+                    <textarea
+                      id="notes"
+                      rows={3}
+                      value={formData.notes || ''}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      placeholder="Additional notes or observations..."
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Any observations or special notes</p>
+                  </div>
                 </div>
               )}
                 </>
               )}
             </div>
+          </form>
+        </div>
 
-            {/* Action Buttons */}
-            <div className="mt-6 flex justify-end space-x-3">
+          {/* Modal Footer with Border */}
+          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+            <div className="flex justify-end space-x-3">
               <button
                 type="button"
                 onClick={onClose}
@@ -715,7 +758,7 @@ export default function ManufacturingFormModal({
                 {isSubmitting ? 'Processing...' : mode === 'create' ? 'Create Step' : mode === 'transfer' ? 'Transfer Items' : 'Save Changes'}
               </button>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
