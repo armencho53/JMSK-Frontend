@@ -317,7 +317,7 @@ export default function ManufacturingFormModal({
                   {/* Remaining Quantities Summary Card */}
                   {remaining && (
                     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                      <h4 className="text-sm font-medium text-gray-900 mb-3">Available to Transfer</h4>
+                      <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">Available to Transfer</h4>
                       <dl className="grid grid-cols-2 gap-4">
                         <div>
                           <dt className="text-xs text-gray-500 uppercase tracking-wide">Quantity</dt>
@@ -333,7 +333,7 @@ export default function ManufacturingFormModal({
 
                   {/* Transfer Amounts Section */}
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-3">Transfer Amounts</h4>
+                    <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 pb-2 border-b border-gray-200">Transfer Amounts</h4>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label htmlFor="transfer_quantity" className="block text-sm font-medium text-gray-700">
@@ -381,7 +381,7 @@ export default function ManufacturingFormModal({
 
                   {/* Destination Section */}
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900 mb-3">Destination</h4>
+                    <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 pb-2 border-b border-gray-200">Destination</h4>
                     <div className="space-y-4">
                       <div>
                         <label htmlFor="next_step_type" className="block text-sm font-medium text-gray-700">
@@ -464,7 +464,7 @@ export default function ManufacturingFormModal({
                 <>
               {/* Basic Information Section */}
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Basic Information</h4>
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 pb-2 border-b border-gray-200">Basic Information</h4>
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="order_id" className="block text-sm font-medium text-gray-700">
@@ -559,7 +559,7 @@ export default function ManufacturingFormModal({
 
               {/* Assignment Section */}
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Assignment</h4>
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 pb-2 border-b border-gray-200">Assignment</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="department" className="block text-sm font-medium text-gray-700">
@@ -600,7 +600,7 @@ export default function ManufacturingFormModal({
 
               {/* Quantity Tracking Section */}
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Quantity Tracking</h4>
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 pb-2 border-b border-gray-200">Quantity Tracking</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="quantity_received" className="block text-sm font-medium text-gray-700">
@@ -639,7 +639,7 @@ export default function ManufacturingFormModal({
 
               {/* Weight Tracking Section */}
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Weight Tracking</h4>
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 pb-2 border-b border-gray-200">Weight Tracking</h4>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="weight_received" className="block text-sm font-medium text-gray-700">
@@ -679,7 +679,7 @@ export default function ManufacturingFormModal({
               {/* Transfer Tracking Section (edit mode) */}
               {mode === 'edit' && (
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">Transfer Tracking</h4>
+                  <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 pb-2 border-b border-gray-200">Transfer Tracking</h4>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="transferred_by" className="block text-sm font-medium text-gray-700">
@@ -716,7 +716,7 @@ export default function ManufacturingFormModal({
               {/* Notes Section (edit mode only) */}
               {mode === 'edit' && (
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">Additional Notes</h4>
+                  <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 pb-2 border-b border-gray-200">Additional Notes</h4>
                   <div>
                     <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
                       Notes
