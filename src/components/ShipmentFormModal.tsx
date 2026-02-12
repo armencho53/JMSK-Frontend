@@ -186,129 +186,175 @@ export default function ShipmentFormModal({
           &#8203;
         </span>
 
-        <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-6">
-          <div className="absolute top-0 right-0 pt-4 pr-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              <span className="sr-only">Close</span>
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+          {/* Modal Header with Border */}
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+              {mode === 'create' ? 'Create Shipment' : 'Edit Shipment'}
+            </h3>
           </div>
 
-          <div className="sm:flex sm:items-start">
-            <div className="w-full">
-              <h3
-                className="text-lg leading-6 font-medium text-gray-900 mb-4"
-                id="modal-title"
-              >
-                {mode === 'create' ? 'Create Shipment' : 'Edit Shipment'}
-              </h3>
+          {/* Modal Body */}
+          <div className="px-6 py-4 max-h-[calc(100vh-16rem)] overflow-y-auto">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault()
+                if (!validate()) {
+                  return
+                }
+                onSubmit(formData)
+              }}
+              className="space-y-6"
+            >
+              {/* Shipment Details Section */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 pb-2 border-b border-gray-200">Shipment Details</h4>
+                <div className="space-y-4">
+                  {/* Order Selection */}
+                  <div>
+                    <label
+                      htmlFor="order"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Order <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="order"
+                      value={formData.order_id}
+                      onChange={(e) => handleOrderChange(parseInt(e.target.value))}
+                      className={`mt-1 block w-full border ${
+                        errors.order_id ? 'border-red-300' : 'border-gray-300'
+                      } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      disabled={mode === 'edit' || isLoadingAddress}
+                    >
+                      <option value={0}>Select an order...</option>
+                      {orders.map((order) => (
+                        <option key={order.id} value={order.id}>
+                          {order.order_number} - {order.contact?.name || order.contact?.name || "Unknown" || 'Unknown Contact'}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="mt-1 text-xs text-gray-500">Order to ship</p>
+                    {errors.order_id && (
+                      <p className="mt-1 text-sm text-red-600">{errors.order_id}</p>
+                    )}
+                  </div>
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  if (!validate()) {
-                    return
-                  }
-                  onSubmit(formData)
-                }}
-                className="space-y-4"
-              >
-                {/* Order Selection */}
-                <div>
-                  <label
-                    htmlFor="order"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Order <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    id="order"
-                    value={formData.order_id}
-                    onChange={(e) => handleOrderChange(parseInt(e.target.value))}
-                    className={`mt-1 block w-full border ${
-                      errors.order_id ? 'border-red-300' : 'border-gray-300'
-                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                    disabled={mode === 'edit' || isLoadingAddress}
-                  >
-                    <option value={0}>Select an order...</option>
-                    {orders.map((order) => (
-                      <option key={order.id} value={order.id}>
-                        {order.order_number} - {order.contact?.name || order.contact?.name || "Unknown" || 'Unknown Contact'}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.order_id && (
-                    <p className="mt-1 text-sm text-red-600">{errors.order_id}</p>
+                  {/* Tracking Number */}
+                  <div>
+                    <label
+                      htmlFor="tracking-number"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Tracking Number <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="tracking-number"
+                      value={formData.tracking_number}
+                      onChange={(e) =>
+                        setFormData({ ...formData, tracking_number: e.target.value })
+                      }
+                      className={`mt-1 block w-full border ${
+                        errors.tracking_number ? 'border-red-300' : 'border-gray-300'
+                      } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      placeholder="1Z999AA10123456784"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Carrier tracking number</p>
+                    {errors.tracking_number && (
+                      <p className="mt-1 text-sm text-red-600">{errors.tracking_number}</p>
+                    )}
+                  </div>
+
+                  {/* Carrier */}
+                  <div>
+                    <label
+                      htmlFor="carrier"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Carrier <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="carrier"
+                      value={formData.carrier}
+                      onChange={(e) =>
+                        setFormData({ ...formData, carrier: e.target.value })
+                      }
+                      className={`mt-1 block w-full border ${
+                        errors.carrier ? 'border-red-300' : 'border-gray-300'
+                      } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      placeholder="UPS, FedEx, DHL, etc."
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Shipping carrier name</p>
+                    {errors.carrier && (
+                      <p className="mt-1 text-sm text-red-600">{errors.carrier}</p>
+                    )}
+                  </div>
+
+                  {/* Shipping Cost */}
+                  <div>
+                    <label
+                      htmlFor="shipping-cost"
+                      className="block text-sm font-medium text-gray-700"
+                    >
+                      Shipping Cost
+                    </label>
+                    <input
+                      type="number"
+                      id="shipping-cost"
+                      min="0"
+                      step="0.01"
+                      value={formData.shipping_cost || ''}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          shipping_cost: e.target.value ? parseFloat(e.target.value) : undefined,
+                        })
+                      }
+                      className={`mt-1 block w-full border ${
+                        errors.shipping_cost ? 'border-red-300' : 'border-gray-300'
+                      } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                      placeholder="0.00"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Total shipping cost</p>
+                    {errors.shipping_cost && (
+                      <p className="mt-1 text-sm text-red-600">{errors.shipping_cost}</p>
+                    )}
+                  </div>
+
+                  {/* Status (only in edit mode) */}
+                  {mode === 'edit' && (
+                    <div>
+                      <label
+                        htmlFor="status"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        Status
+                      </label>
+                      <select
+                        id="status"
+                        value={formData.status || 'PREPARING'}
+                        onChange={(e) =>
+                          setFormData({ ...formData, status: e.target.value })
+                        }
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      >
+                        {statusOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="mt-1 text-xs text-gray-500">Current shipment status</p>
+                    </div>
                   )}
                 </div>
+              </div>
 
-                {/* Tracking Number */}
-                <div>
-                  <label
-                    htmlFor="tracking-number"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Tracking Number <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="tracking-number"
-                    value={formData.tracking_number}
-                    onChange={(e) =>
-                      setFormData({ ...formData, tracking_number: e.target.value })
-                    }
-                    className={`mt-1 block w-full border ${
-                      errors.tracking_number ? 'border-red-300' : 'border-gray-300'
-                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                    placeholder="1Z999AA10123456784"
-                  />
-                  {errors.tracking_number && (
-                    <p className="mt-1 text-sm text-red-600">{errors.tracking_number}</p>
-                  )}
-                </div>
-
-                {/* Carrier */}
-                <div>
-                  <label
-                    htmlFor="carrier"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Carrier <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="carrier"
-                    value={formData.carrier}
-                    onChange={(e) =>
-                      setFormData({ ...formData, carrier: e.target.value })
-                    }
-                    className={`mt-1 block w-full border ${
-                      errors.carrier ? 'border-red-300' : 'border-gray-300'
-                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                    placeholder="UPS, FedEx, DHL, etc."
-                  />
-                  {errors.carrier && (
-                    <p className="mt-1 text-sm text-red-600">{errors.carrier}</p>
-                  )}
-                </div>
-
-                {/* Shipping Address */}
+              {/* Shipping Address Section */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 pb-2 border-b border-gray-200">Shipping Address</h4>
                 <div>
                   <label
                     htmlFor="shipping-address"
@@ -331,73 +377,18 @@ export default function ShipmentFormModal({
                     } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     placeholder="123 Main St, City, State, ZIP"
                   />
+                  <p className="mt-1 text-xs text-gray-500">
+                    {mode === 'create' ? 'Auto-populated from company default address' : 'Delivery address'}
+                  </p>
                   {errors.shipping_address && (
                     <p className="mt-1 text-sm text-red-600">{errors.shipping_address}</p>
                   )}
-                  {!errors.shipping_address && formData.shipping_address && mode === 'create' && (
-                    <p className="mt-1 text-sm text-gray-500">
-                      Auto-populated from company default. You can modify this address for this shipment.
-                    </p>
-                  )}
                 </div>
+              </div>
 
-                {/* Shipping Cost */}
-                <div>
-                  <label
-                    htmlFor="shipping-cost"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Shipping Cost
-                  </label>
-                  <input
-                    type="number"
-                    id="shipping-cost"
-                    min="0"
-                    step="0.01"
-                    value={formData.shipping_cost || ''}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        shipping_cost: e.target.value ? parseFloat(e.target.value) : undefined,
-                      })
-                    }
-                    className={`mt-1 block w-full border ${
-                      errors.shipping_cost ? 'border-red-300' : 'border-gray-300'
-                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                    placeholder="0.00"
-                  />
-                  {errors.shipping_cost && (
-                    <p className="mt-1 text-sm text-red-600">{errors.shipping_cost}</p>
-                  )}
-                </div>
-
-                {/* Status (only in edit mode) */}
-                {mode === 'edit' && (
-                  <div>
-                    <label
-                      htmlFor="status"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Status
-                    </label>
-                    <select
-                      id="status"
-                      value={formData.status || 'PREPARING'}
-                      onChange={(e) =>
-                        setFormData({ ...formData, status: e.target.value })
-                      }
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    >
-                      {statusOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                {/* Notes */}
+              {/* Additional Information Section */}
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3 pb-2 border-b border-gray-200">Additional Information</h4>
                 <div>
                   <label
                     htmlFor="notes"
@@ -415,10 +406,14 @@ export default function ShipmentFormModal({
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="Additional notes..."
                   />
+                  <p className="mt-1 text-xs text-gray-500">Special instructions or notes</p>
                 </div>
+              </div>
+            </form>
+          </div>
 
-                {/* Form Actions */}
-                <div className="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
+          {/* Modal Footer with Border */}
+          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
                   <button
                     type="submit"
                     disabled={isSubmitting}
