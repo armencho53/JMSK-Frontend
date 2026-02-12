@@ -258,6 +258,7 @@ export default function SupplyFormModal({
                       </option>
                     ))}
                   </select>
+                  <p className="mt-1 text-xs text-gray-500">Category of the supply item</p>
                   {errors.type && (
                     <p className="mt-1 text-sm text-red-600">{errors.type}</p>
                   )}
@@ -285,6 +286,7 @@ export default function SupplyFormModal({
                       } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="0"
                     />
+                    <p className="mt-1 text-xs text-gray-500">Current quantity in stock</p>
                     {errors.quantity && (
                       <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
                     )}
@@ -309,6 +311,7 @@ export default function SupplyFormModal({
                       } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="e.g., grams, pieces"
                     />
+                    <p className="mt-1 text-xs text-gray-500">Unit of measurement (grams, pieces, etc.)</p>
                     {errors.unit && (
                       <p className="mt-1 text-sm text-red-600">{errors.unit}</p>
                     )}
@@ -336,6 +339,7 @@ export default function SupplyFormModal({
                     } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     placeholder="0.00"
                   />
+                  <p className="mt-1 text-xs text-gray-500">Price per unit in your currency</p>
                   {errors.cost_per_unit && (
                     <p className="mt-1 text-sm text-red-600">{errors.cost_per_unit}</p>
                   )}
@@ -359,6 +363,7 @@ export default function SupplyFormModal({
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="e.g., ABC Metals Inc."
                   />
+                  <p className="mt-1 text-xs text-gray-500">Name of the supplier or vendor</p>
                 </div>
 
                 {/* Notes */}
@@ -379,55 +384,56 @@ export default function SupplyFormModal({
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="Additional information about this supply"
                   />
-                </div>
-
-                {/* Action Buttons */}
-                <div className="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        {mode === 'create' ? 'Creating...' : 'Updating...'}
-                      </>
-                    ) : mode === 'create' ? (
-                      'Create Supply'
-                    ) : (
-                      'Update Supply'
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isSubmitting}
-                    onClick={onClose}
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Cancel
-                  </button>
+                  <p className="mt-1 text-xs text-gray-500">Any additional details or specifications</p>
                 </div>
               </form>
             </div>
+
+          {/* Modal Footer */}
+          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+            <button
+              type="button"
+              disabled={isSubmitting}
+              onClick={onClose}
+              className="w-full sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="supply-form"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  {mode === 'create' ? 'Creating...' : 'Updating...'}
+                </>
+              ) : mode === 'create' ? (
+                'Create Supply'
+              ) : (
+                'Update Supply'
+              )}
+            </button>
           </div>
         </div>
       </div>
