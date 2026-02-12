@@ -11,6 +11,7 @@ import { Button } from '../components/ui/Button'
 interface Shipment {
   id: number
   order_id: number
+  order_number?: string
   tracking_number: string
   carrier: string
   shipping_address: string
@@ -203,7 +204,7 @@ export default function Shipments() {
                         <p className="flex items-center text-sm text-gray-500">
                           <span className="font-medium">{shipment.carrier || 'No carrier'}</span>
                           <span className="mx-2">•</span>
-                          Order #{shipment.order_id}
+                          Order #{shipment.order_number || shipment.order_id}
                         </p>
                       </div>
                       <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
@@ -212,6 +213,15 @@ export default function Shipments() {
                         </p>
                       </div>
                     </div>
+                    {shipment.status === 'DELIVERED' && shipment.delivered_at && (
+                      <p className="mt-1 text-sm text-green-600 font-medium">
+                        Delivered on {new Date(shipment.delivered_at).toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}
+                      </p>
+                    )}
                     {shipment.shipping_address && (
                       <p className="mt-1 text-sm text-gray-500">
                         {shipment.shipping_address}
