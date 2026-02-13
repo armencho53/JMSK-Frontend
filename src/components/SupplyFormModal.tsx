@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useLookupValues } from '../lib/useLookupValues'
 
 interface Supply {
   id: number
@@ -28,14 +29,6 @@ interface SupplyFormModalProps {
   isSubmitting: boolean
 }
 
-const SUPPLY_TYPES = [
-  { value: 'metal', label: 'Metal' },
-  { value: 'gemstone', label: 'Gemstone' },
-  { value: 'tool', label: 'Tool' },
-  { value: 'packaging', label: 'Packaging' },
-  { value: 'other', label: 'Other' },
-]
-
 export default function SupplyFormModal({
   isOpen,
   onClose,
@@ -54,7 +47,7 @@ export default function SupplyFormModal({
     notes: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
-
+  const { options: supplyTypeOptions, isLoading: supplyTypeLoading, isError: supplyTypeError, refetch: refetchSupplyTypes } = useLookupValues('supply_type')
   // Initialize form data when modal opens or supply changes
   useEffect(() => {
     if (isOpen) {
@@ -243,23 +236,39 @@ export default function SupplyFormModal({
                   >
                     Type <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    id="supply-type"
-                    value={formData.type}
-                    onChange={(e) =>
-                      setFormData({ ...formData, type: e.target.value })
-                    }
-                    className={`mt-1 block w-full border ${
-                      errors.type ? 'border-red-300' : 'border-gray-300'
-                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                  >
-                    <option value="">Select a type</option>
-                    {SUPPLY_TYPES.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
+                  {supplyTypeError ? (
+                    <div className="mt-1 flex items-center space-x-2">
+                      <p className="text-sm text-red-600">Failed to load supply types.</p>
+                      <button
+                        type="button"
+                        onClick={() => refetchSupplyTypes()}
+                        className="text-sm text-indigo-600 hover:text-indigo-500 font-medium"
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  ) : (
+                    <select
+                      id="supply-type"
+                      value={formData.type}
+                      onChange={(e) =>
+                        setFormData({ ...formData, type: e.target.value })
+                      }
+                      disabled={supplyTypeLoading}
+                      className={`mt-1 block w-full border ${
+                        errors.type ? 'border-red-300' : 'border-gray-300'
+                      } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm disabled:opacity-50`}
+                    >
+                      <option value="">
+                        {supplyTypeLoading ? 'Loading...' : 'Select a type'}
                       </option>
-                    ))}
-                  </select>
+                      {supplyTypeOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                   <p className="mt-1 text-xs text-gray-500">Category of the supply item</p>
                   {errors.type && (
                     <p className="mt-1 text-sm text-red-600">{errors.type}</p>

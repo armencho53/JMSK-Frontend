@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import api from '../lib/api'
+import { useLookupValues } from '../lib/useLookupValues'
+import { STEP_STATUS_OPTIONS } from '../lib/constants'
 
 interface ManufacturingStep {
   id: number
@@ -71,23 +73,6 @@ interface ManufacturingFormData {
   notes?: string
 }
 
-const stepTypeOptions = [
-  { value: 'DESIGN', label: 'Design' },
-  { value: 'CASTING', label: 'Casting' },
-  { value: 'STONE_SETTING', label: 'Stone Setting' },
-  { value: 'POLISHING', label: 'Polishing' },
-  { value: 'ENGRAVING', label: 'Engraving' },
-  { value: 'QUALITY_CHECK', label: 'Quality Check' },
-  { value: 'FINISHING', label: 'Finishing' },
-  { value: 'OTHER', label: 'Other' },
-]
-
-const statusOptions = [
-  { value: 'IN_PROGRESS', label: 'In Progress' },
-  { value: 'COMPLETED', label: 'Completed' },
-  { value: 'FAILED', label: 'Failed' },
-]
-
 export default function ManufacturingFormModal({
   isOpen,
   onClose,
@@ -112,6 +97,9 @@ export default function ManufacturingFormModal({
     quantity: number
     weight: number
   } | null>(null)
+
+  // Fetch step type options from lookup values API
+  const { options: stepTypeOptions, isLoading: stepTypeLoading, isError: stepTypeError, refetch: refetchStepTypes } = useLookupValues('step_type')
 
   // Fetch orders for the dropdown
   const { data: orders = [] } = useQuery<Order[]>({ 
@@ -387,21 +375,37 @@ export default function ManufacturingFormModal({
                         <label htmlFor="next_step_type" className="block text-sm font-medium text-gray-700">
                           Next Step Type <span className="text-red-500">*</span>
                         </label>
-                        <select
-                          id="next_step_type"
-                          value={transferData.next_step_type}
-                          onChange={(e) => setTransferData({ ...transferData, next_step_type: e.target.value })}
-                          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                            errors.next_step_type ? 'border-red-500' : ''
-                          }`}
-                        >
-                          <option value="">Select next step type</option>
-                          {stepTypeOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
+                        {stepTypeError ? (
+                          <div className="mt-1 flex items-center space-x-2">
+                            <p className="text-sm text-red-600">Failed to load step types.</p>
+                            <button
+                              type="button"
+                              onClick={() => refetchStepTypes()}
+                              className="text-sm text-indigo-600 hover:text-indigo-500 font-medium"
+                            >
+                              Retry
+                            </button>
+                          </div>
+                        ) : (
+                          <select
+                            id="next_step_type"
+                            value={transferData.next_step_type}
+                            onChange={(e) => setTransferData({ ...transferData, next_step_type: e.target.value })}
+                            disabled={stepTypeLoading}
+                            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 ${
+                              errors.next_step_type ? 'border-red-500' : ''
+                            }`}
+                          >
+                            <option value="">
+                              {stepTypeLoading ? 'Loading...' : 'Select next step type'}
                             </option>
-                          ))}
-                        </select>
+                            {stepTypeOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        )}
                         <p className="mt-1 text-xs text-gray-500">Manufacturing step to transfer to</p>
                         {errors.next_step_type && (
                           <p className="mt-1 text-sm text-red-600">{errors.next_step_type}</p>
@@ -497,21 +501,37 @@ export default function ManufacturingFormModal({
                       <label htmlFor="step_type" className="block text-sm font-medium text-gray-700">
                         Step Type <span className="text-red-500">*</span>
                       </label>
-                      <select
-                        id="step_type"
-                        value={formData.step_type}
-                        onChange={(e) => setFormData({ ...formData, step_type: e.target.value })}
-                        className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-                          errors.step_type ? 'border-red-500' : ''
-                        }`}
-                      >
-                        <option value="">Select step type</option>
-                        {stepTypeOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
+                      {stepTypeError ? (
+                        <div className="mt-1 flex items-center space-x-2">
+                          <p className="text-sm text-red-600">Failed to load step types.</p>
+                          <button
+                            type="button"
+                            onClick={() => refetchStepTypes()}
+                            className="text-sm text-indigo-600 hover:text-indigo-500 font-medium"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      ) : (
+                        <select
+                          id="step_type"
+                          value={formData.step_type}
+                          onChange={(e) => setFormData({ ...formData, step_type: e.target.value })}
+                          disabled={stepTypeLoading}
+                          className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 ${
+                            errors.step_type ? 'border-red-500' : ''
+                          }`}
+                        >
+                          <option value="">
+                            {stepTypeLoading ? 'Loading...' : 'Select step type'}
                           </option>
-                        ))}
-                      </select>
+                          {stepTypeOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      )}
                       <p className="mt-1 text-xs text-gray-500">Type of manufacturing step</p>
                       {errors.step_type && (
                         <p className="mt-1 text-sm text-red-600">{errors.step_type}</p>
@@ -529,7 +549,7 @@ export default function ManufacturingFormModal({
                           onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         >
-                          {statusOptions.map((option) => (
+                          {STEP_STATUS_OPTIONS.map((option) => (
                             <option key={option.value} value={option.value}>
                               {option.label}
                             </option>

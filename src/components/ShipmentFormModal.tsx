@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import api from '../lib/api'
+import { SHIPMENT_STATUS_OPTIONS } from '../lib/constants'
 import { Order } from '../types/order'
 
 interface Shipment {
@@ -36,14 +37,6 @@ interface ShipmentFormData {
   shipping_cost?: number
   notes?: string
 }
-
-const statusOptions = [
-  { value: 'PREPARING', label: 'Preparing' },
-  { value: 'SHIPPED', label: 'Shipped' },
-  { value: 'IN_TRANSIT', label: 'In Transit' },
-  { value: 'DELIVERED', label: 'Delivered' },
-  { value: 'RETURNED', label: 'Returned' },
-]
 
 export default function ShipmentFormModal({
   isOpen,
@@ -341,7 +334,7 @@ export default function ShipmentFormModal({
                         }
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                       >
-                        {statusOptions.map((option) => (
+                        {SHIPMENT_STATUS_OPTIONS.map((option) => (
                           <option key={option.value} value={option.value}>
                             {option.label}
                           </option>

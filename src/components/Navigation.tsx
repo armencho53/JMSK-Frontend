@@ -11,7 +11,8 @@ import {
   UserIcon,
   Bars3Icon,
   XMarkIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  AdjustmentsHorizontalIcon
 } from '@heroicons/react/24/outline';
 
 interface NavigationItem {
@@ -30,6 +31,7 @@ const navigationItems: NavigationItem[] = [
   { name: 'Departments', href: '/departments', icon: BuildingOfficeIcon },
   { name: 'Shipments', href: '/shipments', icon: TruckIcon },
   { name: 'Roles', href: '/roles', icon: UserIcon },
+  { name: 'Lookup Values', href: '/lookup-values', icon: AdjustmentsHorizontalIcon },
 ];
 
 interface NavigationProps {

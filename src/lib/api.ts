@@ -353,3 +353,53 @@ export const fetchShipmentAddress = async (companyId: number): Promise<ShipmentA
   const response = await api.get(`/companies/${companyId}/addresses/shipment-default`)
   return response.data
 }
+
+// ============================================================================
+// Lookup Value API Functions
+// ============================================================================
+
+import type { LookupValue, LookupValueCreate, LookupValueUpdate } from '../types/lookupValue'
+
+/**
+ * Fetch lookup values with optional category filter and inactive inclusion
+ */
+export const fetchLookupValues = async (
+  category?: string,
+  includeInactive?: boolean
+): Promise<LookupValue[]> => {
+  const params: Record<string, string | boolean> = {}
+  if (category) params.category = category
+  if (includeInactive) params.include_inactive = true
+  const response = await api.get('/lookup-values', { params })
+  return response.data
+}
+
+/**
+ * Create a new lookup value
+ */
+export const createLookupValue = async (data: LookupValueCreate): Promise<LookupValue> => {
+  const response = await api.post('/lookup-values', data)
+  return response.data
+}
+
+/**
+ * Update an existing lookup value
+ */
+export const updateLookupValue = async (id: number, data: LookupValueUpdate): Promise<LookupValue> => {
+  const response = await api.put(`/lookup-values/${id}`, data)
+  return response.data
+}
+
+/**
+ * Delete (soft delete) a lookup value
+ */
+export const deleteLookupValue = async (id: number): Promise<void> => {
+  await api.delete(`/lookup-values/${id}`)
+}
+
+/**
+ * Seed default lookup values for the current tenant
+ */
+export const seedLookupDefaults = async (): Promise<void> => {
+  await api.post('/lookup-values/seed')
+}

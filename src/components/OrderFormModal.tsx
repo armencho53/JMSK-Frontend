@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import ContactSelector from './ContactSelector'
 import type { Order } from '../types/order'
 import type { Contact } from '../types/contact'
+import { useLookupValues } from '../lib/useLookupValues'
+import { ORDER_STATUS_OPTIONS } from '../lib/constants'
 
 interface OrderFormModalProps {
   isOpen: boolean
@@ -25,25 +27,6 @@ interface OrderFormData {
   initial_total_weight?: number
 }
 
-const statusOptions = [
-  { value: 'PENDING', label: 'Pending' },
-  { value: 'IN_PROGRESS', label: 'In Progress' },
-  { value: 'COMPLETED', label: 'Completed' },
-  { value: 'SHIPPED', label: 'Shipped' },
-  { value: 'CANCELLED', label: 'Cancelled' },
-]
-
-const metalTypeOptions = [
-  { value: '', label: 'Select metal type' },
-  { value: 'GOLD_24K', label: 'Gold 24K' },
-  { value: 'GOLD_22K', label: 'Gold 22K' },
-  { value: 'GOLD_18K', label: 'Gold 18K' },
-  { value: 'GOLD_14K', label: 'Gold 14K' },
-  { value: 'SILVER_925', label: 'Silver 925' },
-  { value: 'PLATINUM', label: 'Platinum' },
-  { value: 'OTHER', label: 'Other' },
-]
-
 export default function OrderFormModal({
   isOpen,
   onClose,
@@ -58,6 +41,7 @@ export default function OrderFormModal({
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [selectedContact, setSelectedContact] = useState<Contact | undefined>()
+  const { options: metalTypeOptions, isLoading: metalTypeLoading, isError: metalTypeError, refetch: refetchMetalTypes } = useLookupValues('metal_type')
 
   useEffect(() => {
     if (isOpen) {
@@ -337,7 +321,7 @@ export default function OrderFormModal({
                           }
                           className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         >
-                          {statusOptions.map((option) => (
+                          {ORDER_STATUS_OPTIONS.map((option) => (
                             <option key={option.value} value={option.value}>
                               {option.label}
                             </option>
@@ -378,18 +362,35 @@ export default function OrderFormModal({
                     <label htmlFor="metal-type" className="block text-sm font-medium text-gray-700">
                       Metal Type
                     </label>
-                    <select
-                      id="metal-type"
-                      value={formData.metal_type || ''}
-                      onChange={(e) => setFormData({ ...formData, metal_type: e.target.value || undefined })}
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    >
-                      {metalTypeOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
+                    {metalTypeError ? (
+                      <div className="mt-1 flex items-center space-x-2">
+                        <p className="text-sm text-red-600">Failed to load metal types.</p>
+                        <button
+                          type="button"
+                          onClick={() => refetchMetalTypes()}
+                          className="text-sm text-indigo-600 hover:text-indigo-500 font-medium"
+                        >
+                          Retry
+                        </button>
+                      </div>
+                    ) : (
+                      <select
+                        id="metal-type"
+                        value={formData.metal_type || ''}
+                        onChange={(e) => setFormData({ ...formData, metal_type: e.target.value || undefined })}
+                        disabled={metalTypeLoading}
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm disabled:opacity-50"
+                      >
+                        <option value="">
+                          {metalTypeLoading ? 'Loading...' : 'Select metal type'}
                         </option>
-                      ))}
-                    </select>
+                        {metalTypeOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                     <p className="mt-1 text-xs text-gray-500">Type of metal used</p>
                   </div>
 
