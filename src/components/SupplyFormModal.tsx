@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useLookupValues } from '../lib/useLookupValues'
 
 interface Supply {
   id: number
@@ -28,14 +29,6 @@ interface SupplyFormModalProps {
   isSubmitting: boolean
 }
 
-const SUPPLY_TYPES = [
-  { value: 'metal', label: 'Metal' },
-  { value: 'gemstone', label: 'Gemstone' },
-  { value: 'tool', label: 'Tool' },
-  { value: 'packaging', label: 'Packaging' },
-  { value: 'other', label: 'Other' },
-]
-
 export default function SupplyFormModal({
   isOpen,
   onClose,
@@ -54,7 +47,7 @@ export default function SupplyFormModal({
     notes: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
-
+  const { options: supplyTypeOptions, isLoading: supplyTypeLoading, isError: supplyTypeError, refetch: refetchSupplyTypes } = useLookupValues('supply_type')
   // Initialize form data when modal opens or supply changes
   useEffect(() => {
     if (isOpen) {
@@ -174,50 +167,52 @@ export default function SupplyFormModal({
         </span>
 
         {/* Modal panel */}
-        <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-6">
-          <div className="absolute top-0 right-0 pt-4 pr-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              <span className="sr-only">Close</span>
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <div className="sm:flex sm:items-start">
-            <div className="w-full">
+        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+          {/* Modal Header */}
+          <div className="px-6 py-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
               <h3
-                className="text-lg leading-6 font-medium text-gray-900 mb-4"
+                className="text-lg leading-6 font-medium text-gray-900"
                 id="modal-title"
               >
                 {mode === 'create' ? 'Add New Supply' : 'Edit Supply'}
               </h3>
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <span className="sr-only">Close</span>
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Name Input */}
-                <div>
-                  <label
-                    htmlFor="supply-name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
+          {/* Modal Body */}
+          <div className="px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+            <form id="supply-form" onSubmit={handleSubmit} className="space-y-4">
+              {/* Name Input */}
+              <div>
+                <label
+                  htmlFor="supply-name"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
                     id="supply-name"
                     value={formData.name}
                     onChange={(e) =>
@@ -241,23 +236,40 @@ export default function SupplyFormModal({
                   >
                     Type <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    id="supply-type"
-                    value={formData.type}
-                    onChange={(e) =>
-                      setFormData({ ...formData, type: e.target.value })
-                    }
-                    className={`mt-1 block w-full border ${
-                      errors.type ? 'border-red-300' : 'border-gray-300'
-                    } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                  >
-                    <option value="">Select a type</option>
-                    {SUPPLY_TYPES.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.label}
+                  {supplyTypeError ? (
+                    <div className="mt-1 flex items-center space-x-2">
+                      <p className="text-sm text-red-600">Failed to load supply types.</p>
+                      <button
+                        type="button"
+                        onClick={() => refetchSupplyTypes()}
+                        className="text-sm text-indigo-600 hover:text-indigo-500 font-medium"
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  ) : (
+                    <select
+                      id="supply-type"
+                      value={formData.type}
+                      onChange={(e) =>
+                        setFormData({ ...formData, type: e.target.value })
+                      }
+                      disabled={supplyTypeLoading}
+                      className={`mt-1 block w-full border ${
+                        errors.type ? 'border-red-300' : 'border-gray-300'
+                      } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm disabled:opacity-50`}
+                    >
+                      <option value="">
+                        {supplyTypeLoading ? 'Loading...' : 'Select a type'}
                       </option>
-                    ))}
-                  </select>
+                      {supplyTypeOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <p className="mt-1 text-xs text-gray-500">Category of the supply item</p>
                   {errors.type && (
                     <p className="mt-1 text-sm text-red-600">{errors.type}</p>
                   )}
@@ -285,6 +297,7 @@ export default function SupplyFormModal({
                       } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="0"
                     />
+                    <p className="mt-1 text-xs text-gray-500">Current quantity in stock</p>
                     {errors.quantity && (
                       <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
                     )}
@@ -309,6 +322,7 @@ export default function SupplyFormModal({
                       } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="e.g., grams, pieces"
                     />
+                    <p className="mt-1 text-xs text-gray-500">Unit of measurement (grams, pieces, etc.)</p>
                     {errors.unit && (
                       <p className="mt-1 text-sm text-red-600">{errors.unit}</p>
                     )}
@@ -336,6 +350,7 @@ export default function SupplyFormModal({
                     } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     placeholder="0.00"
                   />
+                  <p className="mt-1 text-xs text-gray-500">Price per unit in your currency</p>
                   {errors.cost_per_unit && (
                     <p className="mt-1 text-sm text-red-600">{errors.cost_per_unit}</p>
                   )}
@@ -359,6 +374,7 @@ export default function SupplyFormModal({
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="e.g., ABC Metals Inc."
                   />
+                  <p className="mt-1 text-xs text-gray-500">Name of the supplier or vendor</p>
                 </div>
 
                 {/* Notes */}
@@ -379,55 +395,56 @@ export default function SupplyFormModal({
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                     placeholder="Additional information about this supply"
                   />
-                </div>
-
-                {/* Action Buttons */}
-                <div className="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        {mode === 'create' ? 'Creating...' : 'Updating...'}
-                      </>
-                    ) : mode === 'create' ? (
-                      'Create Supply'
-                    ) : (
-                      'Update Supply'
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isSubmitting}
-                    onClick={onClose}
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Cancel
-                  </button>
+                  <p className="mt-1 text-xs text-gray-500">Any additional details or specifications</p>
                 </div>
               </form>
             </div>
+
+          {/* Modal Footer */}
+          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+            <button
+              type="button"
+              disabled={isSubmitting}
+              onClick={onClose}
+              className="w-full sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="supply-form"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  {mode === 'create' ? 'Creating...' : 'Updating...'}
+                </>
+              ) : mode === 'create' ? (
+                'Create Supply'
+              ) : (
+                'Update Supply'
+              )}
+            </button>
           </div>
         </div>
       </div>

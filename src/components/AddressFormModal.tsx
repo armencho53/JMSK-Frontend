@@ -152,40 +152,42 @@ export default function AddressFormModal({
           &#8203;
         </span>
 
-        <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full sm:p-6">
-          <div className="absolute top-0 right-0 pt-4 pr-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-white rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              <span className="sr-only">Close</span>
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <div className="sm:flex sm:items-start">
-            <div className="w-full">
+        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+          {/* Modal Header */}
+          <div className="px-6 py-4 border-b border-gray-200">
+            <div className="flex items-center justify-between">
               <h3
-                className="text-lg leading-6 font-medium text-gray-900 mb-4"
+                className="text-lg leading-6 font-medium text-gray-900"
                 id="modal-title"
               >
                 {mode === 'create' ? 'Add Address' : 'Edit Address'}
               </h3>
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <span className="sr-only">Close</span>
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Modal Body */}
+          <div className="px-6 py-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+            <form id="address-form" onSubmit={handleSubmit} className="space-y-4">
                 {/* Street Address */}
                 <div>
                   <label
@@ -206,6 +208,7 @@ export default function AddressFormModal({
                     } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                     placeholder="123 Main Street"
                   />
+                  <p className="mt-1 text-xs text-gray-500">Full street address including apartment or suite number</p>
                   {errors.street_address && (
                     <p className="mt-1 text-sm text-red-600">{errors.street_address}</p>
                   )}
@@ -232,6 +235,7 @@ export default function AddressFormModal({
                       } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="New York"
                     />
+                    <p className="mt-1 text-xs text-gray-500">City name</p>
                     {errors.city && (
                       <p className="mt-1 text-sm text-red-600">{errors.city}</p>
                     )}
@@ -256,6 +260,7 @@ export default function AddressFormModal({
                       } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="NY"
                     />
+                    <p className="mt-1 text-xs text-gray-500">State or province</p>
                     {errors.state && (
                       <p className="mt-1 text-sm text-red-600">{errors.state}</p>
                     )}
@@ -283,6 +288,7 @@ export default function AddressFormModal({
                       } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="10001"
                     />
+                    <p className="mt-1 text-xs text-gray-500">Postal or ZIP code</p>
                     {errors.zip_code && (
                       <p className="mt-1 text-sm text-red-600">{errors.zip_code}</p>
                     )}
@@ -307,6 +313,7 @@ export default function AddressFormModal({
                       } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                       placeholder="USA"
                     />
+                    <p className="mt-1 text-xs text-gray-500">Country name</p>
                     {errors.country && (
                       <p className="mt-1 text-sm text-red-600">{errors.country}</p>
                     )}
@@ -335,54 +342,54 @@ export default function AddressFormModal({
                     </p>
                   </div>
                 </div>
-
-                {/* Action Buttons */}
-                <div className="mt-5 sm:mt-6 sm:flex sm:flex-row-reverse">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        {mode === 'create' ? 'Adding...' : 'Updating...'}
-                      </>
-                    ) : mode === 'create' ? (
-                      'Add Address'
-                    ) : (
-                      'Update Address'
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isSubmitting}
-                    onClick={onClose}
-                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Cancel
-                  </button>
-                </div>
               </form>
             </div>
+
+          {/* Modal Footer */}
+          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+            <button
+              type="button"
+              disabled={isSubmitting}
+              onClick={onClose}
+              className="w-full sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="address-form"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  {mode === 'create' ? 'Adding...' : 'Updating...'}
+                </>
+              ) : mode === 'create' ? (
+                'Add Address'
+              ) : (
+                'Update Address'
+              )}
+            </button>
           </div>
         </div>
       </div>
