@@ -1,0 +1,107 @@
+{
+  "passed": 20,
+  "failed": 0,
+  "tests": [
+    {
+      "name": "Backend Health",
+      "passed": true,
+      "message": "Health OK (200)"
+    },
+    {
+      "name": "Login Endpoint",
+      "passed": true,
+      "message": "POST /auth/login — 401 with CORS OK (auth rejected as expected)"
+    },
+    {
+      "name": "CORS Preflight /orders/",
+      "passed": true,
+      "message": "OPTIONS /orders/ — CORS OK (origin: *, methods: GET,POST,PUT,PATCH,DELETE,OPTIONS)"
+    },
+    {
+      "name": "Endpoint /orders/",
+      "passed": true,
+      "message": "GET /orders/ — 401 with CORS OK"
+    },
+    {
+      "name": "CORS Preflight /supplies/",
+      "passed": true,
+      "message": "OPTIONS /supplies/ — CORS OK (origin: *, methods: GET,POST,PUT,PATCH,DELETE,OPTIONS)"
+    },
+    {
+      "name": "Endpoint /supplies/",
+      "passed": true,
+      "message": "GET /supplies/ — 401 with CORS OK"
+    },
+    {
+      "name": "CORS Preflight /shipments/",
+      "passed": true,
+      "message": "OPTIONS /shipments/ — CORS OK (origin: *, methods: GET,POST,PUT,PATCH,DELETE,OPTIONS)"
+    },
+    {
+      "name": "Endpoint /shipments/",
+      "passed": true,
+      "message": "GET /shipments/ — 401 with CORS OK"
+    },
+    {
+      "name": "CORS Preflight /departments/",
+      "passed": true,
+      "message": "OPTIONS /departments/ — CORS OK (origin: *, methods: GET,POST,PUT,PATCH,DELETE,OPTIONS)"
+    },
+    {
+      "name": "Endpoint /departments/",
+      "passed": true,
+      "message": "GET /departments/ — 401 with CORS OK"
+    },
+    {
+      "name": "CORS Preflight /roles/",
+      "passed": true,
+      "message": "OPTIONS /roles/ — CORS OK (origin: *, methods: GET,POST,PUT,PATCH,DELETE,OPTIONS)"
+    },
+    {
+      "name": "Endpoint /roles/",
+      "passed": true,
+      "message": "GET /roles/ — 401 with CORS OK"
+    },
+    {
+      "name": "CORS Preflight /contacts/",
+      "passed": true,
+      "message": "OPTIONS /contacts/ — CORS OK (origin: *, methods: GET,POST,PUT,PATCH,DELETE,OPTIONS)"
+    },
+    {
+      "name": "Endpoint /contacts/",
+      "passed": true,
+      "message": "GET /contacts/ — 401 with CORS OK"
+    },
+    {
+      "name": "CORS Preflight /companies/",
+      "passed": true,
+      "message": "OPTIONS /companies/ — CORS OK (origin: *, methods: GET,POST,PUT,PATCH,DELETE,OPTIONS)"
+    },
+    {
+      "name": "Endpoint /companies/",
+      "passed": true,
+      "message": "GET /companies/ — 401 with CORS OK"
+    },
+    {
+      "name": "CORS Preflight /manufacturing/steps",
+      "passed": true,
+      "message": "OPTIONS /manufacturing/steps — CORS OK (origin: *, methods: GET,POST,PUT,PATCH,DELETE,OPTIONS)"
+    },
+    {
+      "name": "Endpoint /manufacturing/steps",
+      "passed": true,
+      "message": "GET /manufacturing/steps — 401 with CORS OK"
+    },
+    {
+      "name": "CORS Preflight /lookup-values/",
+      "passed": true,
+      "message": "OPTIONS /lookup-values/ — CORS OK (origin: *, methods: GET,POST,PUT,PATCH,DELETE,OPTIONS)"
+    },
+    {
+      "name": "Endpoint /lookup-values/",
+      "passed": true,
+      "message": "GET /lookup-values/ — 401 with CORS OK"
+    }
+  ],
+  "timestamp": "2026-02-13T20:08:54.704Z"
+}
