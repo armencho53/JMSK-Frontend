@@ -303,7 +303,7 @@ export default function Dashboard() {
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <p style={{ fontWeight: '500', color: '#0f172a', margin: '0 0 2px 0' }}>
-                          {supply.quantity_grams || 0}g
+                          {supply.quantity || 0}{supply.unit || 'g'}
                         </p>
                         <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
                           Available
