@@ -295,9 +295,9 @@ export default function ManufacturingFormModal({
             )}
           </div>
 
+          <form onSubmit={handleSubmit}>
           {/* Modal Body */}
           <div className="px-6 py-4 max-h-[calc(100vh-16rem)] overflow-y-auto">
-            <form onSubmit={handleSubmit}>
               <div className="space-y-4">
               {/* Transfer Mode Form */}
               {mode === 'transfer' && (
@@ -756,7 +756,6 @@ export default function ManufacturingFormModal({
                 </>
               )}
             </div>
-          </form>
         </div>
 
           {/* Modal Footer with Border */}
@@ -779,6 +778,7 @@ export default function ManufacturingFormModal({
               </button>
             </div>
           </div>
+          </form>
         </div>
       </div>
     </div>
