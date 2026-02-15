@@ -204,7 +204,7 @@ export default function Shipments() {
                         <p className="flex items-center text-sm text-gray-500">
                           <span className="font-medium">{shipment.carrier || 'No carrier'}</span>
                           <span className="mx-2">•</span>
-                          Order: {shipment.order_number} 
+                          Order #{shipment.order_number || shipment.order_id} 
                         </p>
                       </div>
                       <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
