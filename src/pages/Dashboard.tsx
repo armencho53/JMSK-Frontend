@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { Link } from 'react-router-dom'
 import api from '../lib/api'
 
 export default function Dashboard() {
@@ -93,7 +94,7 @@ export default function Dashboard() {
         {/* Key Metrics Cards - Professional Design */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Total Supplies */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-200">
+          <Link to="/supplies" className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-200 block">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center mr-4">
                 <div className="w-6 h-6 bg-white rounded"></div>
@@ -107,10 +108,10 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
-          </div>
+          </Link>
 
           {/* Active Orders */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-200">
+          <Link to="/orders" className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-200 block">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center mr-4">
                 <div className="w-6 h-6 border-2 border-white rounded"></div>
@@ -124,10 +125,10 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
-          </div>
+          </Link>
 
           {/* Completed Orders */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-200">
+          <Link to="/orders" className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-200 block">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mr-4">
                 <div className="w-3 h-3 bg-white rounded-full"></div>
@@ -141,10 +142,10 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
-          </div>
+          </Link>
 
           {/* Shipments */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-200">
+          <Link to="/shipments" className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow duration-200 block">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-slate-700 rounded-xl flex items-center justify-center mr-4">
                 <div className="w-4 h-2 bg-white rounded-sm"></div>
@@ -158,7 +159,7 @@ export default function Dashboard() {
                 </p>
               </div>
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Content Grid - Professional Layout */}
@@ -191,14 +192,22 @@ export default function Dashboard() {
               {orders && orders.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {orders.slice(0, 5).map((order: any) => (
-                    <div key={order.id} style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'space-between', 
-                      padding: '16px', 
-                      backgroundColor: '#f8fafc', 
-                      borderRadius: '8px' 
-                    }}>
+                    <Link 
+                      key={order.id} 
+                      to={`/orders/${order.id}`}
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'space-between', 
+                        padding: '16px', 
+                        backgroundColor: '#f8fafc', 
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
+                    >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <div style={{ 
                           width: '8px', 
@@ -236,7 +245,7 @@ export default function Dashboard() {
                           {order.status?.replace('_', ' ') || 'pending'}
                         </span>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               ) : (
@@ -277,14 +286,22 @@ export default function Dashboard() {
               {supplies && supplies.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {supplies.slice(0, 5).map((supply: any) => (
-                    <div key={supply.id} style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'space-between', 
-                      padding: '16px', 
-                      backgroundColor: '#f8fafc', 
-                      borderRadius: '8px' 
-                    }}>
+                    <Link 
+                      key={supply.id} 
+                      to={`/supplies/${supply.id}`}
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'space-between', 
+                        padding: '16px', 
+                        backgroundColor: '#f8fafc', 
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
+                    >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <div style={{ 
                           width: '8px', 
@@ -309,7 +326,7 @@ export default function Dashboard() {
                           Available
                         </p>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               ) : (
