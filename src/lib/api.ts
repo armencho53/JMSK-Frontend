@@ -403,3 +403,58 @@ export const deleteLookupValue = async (id: number): Promise<void> => {
 export const seedLookupDefaults = async (): Promise<void> => {
   await api.post('/lookup-values/seed')
 }
+
+// ============================================================================
+// Metal API Functions
+// ============================================================================
+
+import type { Metal, MetalCreate, MetalUpdate } from '../types/metal'
+
+export const fetchMetals = async (includeInactive?: boolean): Promise<Metal[]> => {
+  const params: Record<string, boolean> = {}
+  if (includeInactive) params.include_inactive = true
+  const response = await api.get('/metals', { params })
+  return response.data
+}
+
+export const createMetal = async (data: MetalCreate): Promise<Metal> => {
+  const response = await api.post('/metals', data)
+  return response.data
+}
+
+export const updateMetal = async (id: number, data: MetalUpdate): Promise<Metal> => {
+  const response = await api.put(`/metals/${id}`, data)
+  return response.data
+}
+
+export const deactivateMetal = async (id: number): Promise<void> => {
+  await api.delete(`/metals/${id}`)
+}
+
+// ============================================================================
+// Company Metal Balance API Functions
+// ============================================================================
+
+export interface CompanyMetalBalance {
+  id: number
+  metal_id: number
+  metal_code: string
+  metal_name: string
+  balance_grams: number
+}
+
+export interface MetalDepositCreate {
+  metal_id: number
+  quantity_grams: number
+  notes?: string
+}
+
+export const fetchCompanyMetalBalances = async (companyId: number): Promise<CompanyMetalBalance[]> => {
+  const response = await api.get(`/companies/${companyId}/metal-balances`)
+  return response.data
+}
+
+export const recordMetalDeposit = async (companyId: number, data: MetalDepositCreate): Promise<any> => {
+  const response = await api.post(`/companies/${companyId}/metal-deposits`, data)
+  return response.data
+}

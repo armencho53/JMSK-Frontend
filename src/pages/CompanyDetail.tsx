@@ -17,6 +17,7 @@ import CompanyFormModal from '../components/CompanyFormModal'
 import AddressFormModal from '../components/AddressFormModal'
 import AddressList from '../components/AddressList'
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal'
+import CompanyMetalBalances from '../components/CompanyMetalBalances'
 import { CompanyUpdate } from '../types/company'
 import { Contact } from '../types/contact'
 import { Order } from '../types/order'
@@ -121,7 +122,7 @@ export default function CompanyDetail() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'contacts' | 'orders' | 'addresses'>('contacts')
+  const [activeTab, setActiveTab] = useState<'contacts' | 'orders' | 'addresses' | 'metal-balances'>('contacts')
 
   const { data: company, isLoading: companyLoading } = useQuery({
     queryKey: ['company', companyId],
@@ -315,6 +316,16 @@ export default function CompanyDetail() {
             >
               Addresses
             </button>
+            <button
+              onClick={() => setActiveTab('metal-balances')}
+              className={`${
+                activeTab === 'metal-balances'
+                  ? 'border-indigo-500 text-indigo-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+            >
+              Metal Balances
+            </button>
           </nav>
         </div>
 
@@ -362,6 +373,10 @@ export default function CompanyDetail() {
                 companyId={Number(companyId)} 
               />
             </div>
+          )}
+
+          {activeTab === 'metal-balances' && (
+            <CompanyMetalBalances companyId={Number(companyId)} />
           )}
         </div>
       </div>

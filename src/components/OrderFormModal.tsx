@@ -25,6 +25,7 @@ interface OrderFormData {
   metal_type?: string
   target_weight_per_piece?: number
   initial_total_weight?: number
+  labor_cost?: number
 }
 
 export default function OrderFormModal({
@@ -57,6 +58,7 @@ export default function OrderFormModal({
           metal_type: order.metal_type,
           target_weight_per_piece: order.target_weight_per_piece,
           initial_total_weight: order.initial_total_weight,
+          labor_cost: order.labor_cost,
         })
         if (order.contact) {
           setSelectedContact(order.contact as Contact)
@@ -435,6 +437,26 @@ export default function OrderFormModal({
                       />
                       <p className="mt-1 text-xs text-gray-500">Total raw material weight</p>
                     </div>
+                  </div>
+
+                  {/* Labor Cost */}
+                  <div className="mt-4">
+                    <label htmlFor="labor-cost" className="block text-sm font-medium text-gray-700">
+                      Labor Cost
+                    </label>
+                    <input
+                      type="number"
+                      id="labor-cost"
+                      min="0"
+                      step="0.01"
+                      value={formData.labor_cost ?? ''}
+                      onChange={(e) =>
+                        setFormData({ ...formData, labor_cost: e.target.value ? parseFloat(e.target.value) : undefined })
+                      }
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder="0.00"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Manufacturing labor cost for this order</p>
                   </div>
                 </div>
               </form>

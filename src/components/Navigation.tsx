@@ -12,7 +12,8 @@ import {
   Bars3Icon,
   XMarkIcon,
   ChevronRightIcon,
-  AdjustmentsHorizontalIcon
+  AdjustmentsHorizontalIcon,
+  SwatchIcon,
 } from '@heroicons/react/24/outline';
 
 interface NavigationItem {
@@ -31,6 +32,7 @@ const navigationItems: NavigationItem[] = [
   { name: 'Departments', href: '/departments', icon: BuildingOfficeIcon },
   { name: 'Shipments', href: '/shipments', icon: TruckIcon },
   { name: 'Roles', href: '/roles', icon: UserIcon },
+  { name: 'Metals', href: '/metals', icon: SwatchIcon },
   { name: 'Lookup Values', href: '/lookup-values', icon: AdjustmentsHorizontalIcon },
 ];
 
