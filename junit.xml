@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="4" failures="0" errors="0" time="0.692">
-  <testsuite name="API Configuration" errors="0" failures="0" skipped="0" timestamp="2026-02-13T19:13:17" time="0.16" tests="2">
-    <testcase classname="API Configuration axios create should be called" name="API Configuration axios create should be called" time="0.001">
+<testsuites name="jest tests" tests="4" failures="0" errors="0" time="1.021">
+  <testsuite name="API Configuration" errors="0" failures="0" skipped="0" timestamp="2026-02-18T00:45:34" time="0.252" tests="2">
+    <testcase classname="API Configuration axios create should be called" name="API Configuration axios create should be called" time="0.002">
     </testcase>
     <testcase classname="API Configuration api client configuration is testable" name="API Configuration api client configuration is testable" time="0.001">
     </testcase>
   </testsuite>
-  <testsuite name="App Component" errors="0" failures="0" skipped="0" timestamp="2026-02-13T19:13:17" time="0.312" tests="2">
-    <testcase classname="App Component can be imported without errors" name="App Component can be imported without errors" time="0.149">
+  <testsuite name="App Component" errors="0" failures="0" skipped="0" timestamp="2026-02-18T00:45:34" time="0.462" tests="2">
+    <testcase classname="App Component can be imported without errors" name="App Component can be imported without errors" time="0.2">
     </testcase>
     <testcase classname="App Component basic component structure exists" name="App Component basic component structure exists" time="0">
     </testcase>

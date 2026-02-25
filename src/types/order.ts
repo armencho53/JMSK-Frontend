@@ -34,6 +34,7 @@ export interface Order {
   metal_type?: string
   target_weight_per_piece?: number
   initial_total_weight?: number
+  labor_cost?: number
   
   created_at: string
   updated_at: string
@@ -50,6 +51,7 @@ export interface OrderCreate {
   metal_type?: string
   target_weight_per_piece?: number
   initial_total_weight?: number
+  labor_cost?: number
 }
 
 export interface OrderUpdate {
@@ -63,4 +65,5 @@ export interface OrderUpdate {
   metal_type?: string
   target_weight_per_piece?: number
   initial_total_weight?: number
+  labor_cost?: number
 }

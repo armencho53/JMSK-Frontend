@@ -65,6 +65,7 @@ function App() {
               <Route path="departments" element={<Departments />} />
               <Route path="shipments" element={<Shipments />} />
               <Route path="roles" element={<Roles />} />
+              <Route path="metals" element={<Navigate to="/supplies?tab=metals" replace />} />
               <Route path="lookup-values" element={<LookupValues />} />
             </Route>
           </Routes>

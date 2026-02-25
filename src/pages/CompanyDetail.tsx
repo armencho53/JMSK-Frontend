@@ -17,6 +17,8 @@ import CompanyFormModal from '../components/CompanyFormModal'
 import AddressFormModal from '../components/AddressFormModal'
 import AddressList from '../components/AddressList'
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal'
+import CompanyMetalBalances from '../components/CompanyMetalBalances'
+import { useCompanyMetalBalances } from '../hooks/useCompanyMetalBalances'
 import { CompanyUpdate } from '../types/company'
 import { Contact } from '../types/contact'
 import { Order } from '../types/order'
@@ -121,7 +123,7 @@ export default function CompanyDetail() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [isAddAddressModalOpen, setIsAddAddressModalOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'contacts' | 'orders' | 'addresses'>('contacts')
+  const [activeTab, setActiveTab] = useState<'contacts' | 'orders' | 'addresses' | 'metal-balances'>('contacts')
 
   const { data: company, isLoading: companyLoading } = useQuery({
     queryKey: ['company', companyId],
@@ -152,6 +154,8 @@ export default function CompanyDetail() {
     queryFn: () => fetchCompanyBalance(Number(companyId)),
     enabled: !!companyId
   })
+
+  const { balances: metalBalances, isError: metalBalancesError } = useCompanyMetalBalances(Number(companyId))
 
   useEffect(() => {
     if (company) {
@@ -266,16 +270,28 @@ export default function CompanyDetail() {
       {balance !== undefined && (
         <Card variant="elevated" className="mb-6">
           <CardContent>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm text-slate-600">Total Balance</p>
+                <p className="text-sm text-slate-600">Cash Balance</p>
                 <p className={`text-2xl font-semibold ${balance.total_balance < 0 ? 'text-red-600' : 'text-slate-900'}`}>
                   ${balance.total_balance.toFixed(2)}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-slate-600">Contacts</p>
-                <p className="text-2xl font-semibold text-slate-900">{contacts?.length || 0}</p>
+                <p className="text-sm text-slate-600">Metal Balances</p>
+                {metalBalancesError ? (
+                  <p className="text-sm text-slate-500">Unable to load metal balances</p>
+                ) : metalBalances.length === 0 ? (
+                  <p className="text-sm text-slate-500">No metal balances</p>
+                ) : (
+                  <div className="space-y-1">
+                    {metalBalances.map((mb) => (
+                      <p key={mb.id} className={`text-sm font-medium ${mb.balance_grams < 0 ? 'text-red-600' : 'text-slate-900'}`}>
+                        {mb.metal_code}: {mb.balance_grams}g
+                      </p>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
@@ -314,6 +330,16 @@ export default function CompanyDetail() {
               } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
             >
               Addresses
+            </button>
+            <button
+              onClick={() => setActiveTab('metal-balances')}
+              className={`${
+                activeTab === 'metal-balances'
+                  ? 'border-indigo-500 text-indigo-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900 hover:border-slate-300'
+              } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors`}
+            >
+              Metal Balances
             </button>
           </nav>
         </div>
@@ -362,6 +388,10 @@ export default function CompanyDetail() {
                 companyId={Number(companyId)} 
               />
             </div>
+          )}
+
+          {activeTab === 'metal-balances' && (
+            <CompanyMetalBalances companyId={Number(companyId)} />
           )}
         </div>
       </div>
