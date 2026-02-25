@@ -1,8 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState, useEffect } from 'react'
+import { useQuery, useQueries, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import { fetchCompanies, createCompany, updateCompany, deleteCompany } from '../lib/api'
+import { fetchCompanies, createCompany, updateCompany, deleteCompany, fetchCompanyMetalBalances } from '../lib/api'
+import type { CompanyMetalBalance } from '../lib/api'
 import { showSuccessToast, showErrorToast } from '../lib/toast'
 import CompanyFormModal from '../components/CompanyFormModal'
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal'
@@ -16,7 +17,8 @@ import { Input } from '../components/ui/Input'
 // Define table columns for companies
 const getCompanyColumns = (
   onEdit: (company: CompanyWithContacts) => void,
-  onDelete: (company: CompanyWithContacts) => void
+  onDelete: (company: CompanyWithContacts) => void,
+  metalBalancesMap: Map<number, CompanyMetalBalance[]>
 ): TableColumn<CompanyWithContacts>[] => [
   {
     key: 'name',
@@ -63,6 +65,27 @@ const getCompanyColumns = (
         ${value?.toFixed(2) || '0.00'}
       </span>
     )
+  },
+  {
+    key: 'metal_balances',
+    title: 'Metal Balances',
+    render: (_, record: CompanyWithContacts) => {
+      const balances = metalBalancesMap.get(record.id)
+      if (!balances || balances.length === 0) {
+        return <span className="text-slate-500">-</span>
+      }
+      return (
+        <div>
+          {balances.map((balance) => (
+            <div key={balance.id}>
+              <span className={balance.balance_grams < 0 ? 'text-red-600' : ''}>
+                {balance.metal_code} : {balance.balance_grams} grams
+              </span>
+            </div>
+          ))}
+        </div>
+      )
+    }
   },
   {
     key: 'actions',
@@ -116,6 +139,31 @@ export default function Companies() {
     queryKey: ['companies', searchQuery],
     queryFn: () => fetchCompanies() as Promise<CompanyWithContacts[]>
   })
+
+  // Fetch metal balances for all loaded companies in parallel
+  const metalBalanceQueries = useQueries({
+    queries: (companies ?? []).map((company) => ({
+      queryKey: ['company-metal-balances', company.id],
+      queryFn: () => fetchCompanyMetalBalances(company.id),
+      enabled: !!companies,
+      staleTime: 2 * 60 * 1000,
+    })),
+  })
+
+  // Build a Map<number, CompanyMetalBalance[]> from the results
+  // If a query fails for a company, that company maps to an empty array (graceful degradation)
+  const metalBalancesMap = useMemo(() => {
+    const map = new Map<number, CompanyMetalBalance[]>()
+    if (!companies) return map
+    companies.forEach((company, index) => {
+      const query = metalBalanceQueries[index]
+      if (query?.isSuccess && query.data) {
+        map.set(company.id, query.data)
+      }
+      // Failed or loading queries are not added — absence in the map signals "-" display
+    })
+    return map
+  }, [companies, metalBalanceQueries])
 
   const createCompanyMutation = useMutation({
     mutationFn: (data: CompanyCreate) => createCompany(data),
@@ -203,7 +251,7 @@ export default function Companies() {
   })
 
   // Define table columns
-  const columns = getCompanyColumns(handleEditClick, handleDeleteClick);
+  const columns = getCompanyColumns(handleEditClick, handleDeleteClick, metalBalancesMap);
 
   if (isLoading) {
     return (

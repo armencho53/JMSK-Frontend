@@ -18,6 +18,7 @@ import AddressFormModal from '../components/AddressFormModal'
 import AddressList from '../components/AddressList'
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal'
 import CompanyMetalBalances from '../components/CompanyMetalBalances'
+import { useCompanyMetalBalances } from '../hooks/useCompanyMetalBalances'
 import { CompanyUpdate } from '../types/company'
 import { Contact } from '../types/contact'
 import { Order } from '../types/order'
@@ -154,6 +155,8 @@ export default function CompanyDetail() {
     enabled: !!companyId
   })
 
+  const { balances: metalBalances, isError: metalBalancesError } = useCompanyMetalBalances(Number(companyId))
+
   useEffect(() => {
     if (company) {
       document.title = `${company.name} - Company Details - JMSK`
@@ -267,16 +270,28 @@ export default function CompanyDetail() {
       {balance !== undefined && (
         <Card variant="elevated" className="mb-6">
           <CardContent>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-start">
               <div>
-                <p className="text-sm text-slate-600">Total Balance</p>
+                <p className="text-sm text-slate-600">Cash Balance</p>
                 <p className={`text-2xl font-semibold ${balance.total_balance < 0 ? 'text-red-600' : 'text-slate-900'}`}>
                   ${balance.total_balance.toFixed(2)}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-slate-600">Contacts</p>
-                <p className="text-2xl font-semibold text-slate-900">{contacts?.length || 0}</p>
+                <p className="text-sm text-slate-600">Metal Balances</p>
+                {metalBalancesError ? (
+                  <p className="text-sm text-slate-500">Unable to load metal balances</p>
+                ) : metalBalances.length === 0 ? (
+                  <p className="text-sm text-slate-500">No metal balances</p>
+                ) : (
+                  <div className="space-y-1">
+                    {metalBalances.map((mb) => (
+                      <p key={mb.id} className={`text-sm font-medium ${mb.balance_grams < 0 ? 'text-red-600' : 'text-slate-900'}`}>
+                        {mb.metal_code}: {mb.balance_grams}g
+                      </p>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>

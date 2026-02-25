@@ -8,7 +8,6 @@ export default function Layout() {
   const navigation = [
     { name: 'Dashboard', href: '/', icon: '📊' },
     { name: 'Supplies', href: '/supplies', icon: '📦' },
-    { name: 'Metals', href: '/metals', icon: '📦' },
     { name: 'Companies', href: '/companies', icon: '🏢' },
     { name: 'Orders', href: '/orders', icon: '📋' },
     { name: 'Manufacturing', href: '/manufacturing', icon: '⚙️' },

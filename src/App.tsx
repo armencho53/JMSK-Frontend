@@ -14,7 +14,6 @@ import Shipments from './pages/Shipments'
 import Roles from './pages/Roles'
 import Departments from './pages/Departments'
 import LookupValues from './pages/LookupValues'
-import Metals from './pages/Metals'
 import Layout from './components/Layout'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -66,7 +65,7 @@ function App() {
               <Route path="departments" element={<Departments />} />
               <Route path="shipments" element={<Shipments />} />
               <Route path="roles" element={<Roles />} />
-              <Route path="metals" element={<Metals />} />
+              <Route path="metals" element={<Navigate to="/supplies?tab=metals" replace />} />
               <Route path="lookup-values" element={<LookupValues />} />
             </Route>
           </Routes>

@@ -12,10 +12,15 @@ export function useMetals(includeInactive = false) {
     staleTime: 5 * 60 * 1000,
   })
 
+  const invalidateRelatedQueries = () => {
+    queryClient.invalidateQueries({ queryKey: ['metals'] })
+    queryClient.invalidateQueries({ queryKey: ['supplies'] })
+  }
+
   const createMutation = useMutation({
     mutationFn: (data: MetalCreate) => createMetal(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['metals'] })
+      invalidateRelatedQueries()
       showSuccessToast('Metal created successfully')
     },
     onError: (err: any) => {
@@ -27,7 +32,7 @@ export function useMetals(includeInactive = false) {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: MetalUpdate }) => updateMetal(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['metals'] })
+      invalidateRelatedQueries()
       showSuccessToast('Metal updated successfully')
     },
     onError: (err: any) => {
@@ -39,7 +44,7 @@ export function useMetals(includeInactive = false) {
   const deactivateMutation = useMutation({
     mutationFn: (id: number) => deactivateMetal(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['metals'] })
+      invalidateRelatedQueries()
       showSuccessToast('Metal deactivated')
     },
     onError: (err: any) => {
@@ -51,7 +56,7 @@ export function useMetals(includeInactive = false) {
   const reactivateMutation = useMutation({
     mutationFn: (id: number) => updateMetal(id, { is_active: true }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['metals'] })
+      invalidateRelatedQueries()
       showSuccessToast('Metal reactivated')
     },
     onError: (err: any) => {
