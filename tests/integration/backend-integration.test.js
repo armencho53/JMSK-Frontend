@@ -84,20 +84,42 @@ async function testAPIConfiguration(page) {
   log('Testing API configuration...');
   
   try {
-    await page.goto(FRONTEND_URL);
-    
-    // Check if API URL is correctly configured
-    const apiUrl = await page.evaluate(() => {
-      // Check localStorage first, then window object
-      return window.localStorage.getItem('apiUrl') || window.VITE_API_URL || '';
+    // Intercept network requests to verify the frontend is calling the correct backend URL.
+    // Vite injects VITE_API_URL at build time via import.meta.env (not window), so we
+    // observe actual outgoing requests instead of reading a global variable.
+    const apiRequests = [];
+    page.on('request', (req) => {
+      const url = req.url();
+      if (url.includes('/api/v1/')) {
+        apiRequests.push(url);
+      }
     });
-    
-    if (apiUrl && apiUrl.includes(BACKEND_URL.replace(/^https?:\/\//, ''))) {
-      log('API configuration is correct', 'info');
-      return { passed: true, message: 'API URL is correctly configured' };
+
+    await page.goto(`${FRONTEND_URL}/login`, { waitUntil: 'networkidle', timeout: 15000 });
+
+    // Try to trigger an API call by submitting the login form
+    const emailInput = await page.$('input[type="email"]');
+    if (emailInput) {
+      await page.fill('input[type="email"]', 'probe@test.com');
+      await page.fill('input[type="password"]', 'probe');
+      await page.click('button[type="submit"]').catch(() => {});
+      // Give the request a moment to fire
+      await page.waitForTimeout(2000);
+    }
+
+    const backendHost = BACKEND_URL.replace(/^https?:\/\//, '');
+    const matchingRequest = apiRequests.find((url) => url.includes(backendHost));
+
+    if (matchingRequest) {
+      log('API configuration is correct — frontend calls the expected backend', 'info');
+      return { passed: true, message: `API URL correctly targets ${backendHost}` };
+    } else if (apiRequests.length > 0) {
+      const actualHost = new URL(apiRequests[0]).host;
+      log(`API requests go to ${actualHost} instead of ${backendHost}`, 'warn');
+      return { passed: false, message: `API URL mismatch: requests go to ${actualHost}` };
     } else {
-      log(`API configuration mismatch. Expected: ${BACKEND_URL}, Got: ${apiUrl}`, 'warn');
-      return { passed: false, message: `API URL mismatch: ${apiUrl}` };
+      log('No API requests observed — cannot verify configuration', 'warn');
+      return { passed: false, message: 'No API requests captured to verify configuration' };
     }
   } catch (error) {
     log(`API configuration test failed: ${error.message}`, 'error');
@@ -143,10 +165,10 @@ async function testAPIEndpoints(page) {
   log('Testing API endpoints accessibility...');
   
   const endpoints = [
-    '/api/customers',
-    '/api/orders',
-    '/api/companies',
-    '/api/roles'
+    '/api/v1/customers',
+    '/api/v1/orders',
+    '/api/v1/companies',
+    '/api/v1/roles'
   ];
   
   const endpointResults = [];
