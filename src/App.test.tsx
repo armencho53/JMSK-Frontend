@@ -60,12 +60,15 @@ jest.mock('./components/Layout', () => {
 jest.mock('./pages/Supplies', () => () => <div>Supplies</div>);
 jest.mock('./pages/Companies', () => () => <div>Companies</div>);
 jest.mock('./pages/CompanyDetail', () => () => <div>CompanyDetail</div>);
+jest.mock('./pages/Contacts', () => () => <div>Contacts</div>);
+jest.mock('./pages/ContactDetail', () => () => <div>ContactDetail</div>);
 jest.mock('./pages/Orders', () => () => <div>Orders</div>);
 jest.mock('./pages/OrderDetail', () => () => <div>OrderDetail</div>);
 jest.mock('./pages/DepartmentLedger', () => () => <div>Department Ledger</div>);
 jest.mock('./pages/Shipments', () => () => <div>Shipments</div>);
 jest.mock('./pages/Roles', () => () => <div>Roles</div>);
 jest.mock('./pages/Departments', () => () => <div>Departments</div>);
+jest.mock('./pages/Metals', () => () => <div>Metals</div>);
 jest.mock('./pages/LookupValues', () => () => <div>LookupValues</div>);
 
 // Mock ThemeProvider
