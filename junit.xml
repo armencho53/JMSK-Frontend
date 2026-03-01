@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="16" failures="0" errors="0" time="0.425">
-  <testsuite name="API Configuration" errors="0" failures="0" skipped="0" timestamp="2026-03-01T17:47:45" time="0.077" tests="2">
-    <testcase classname="API Configuration axios create should be called" name="API Configuration axios create should be called" time="0.001">
+<testsuites name="jest tests" tests="16" failures="0" errors="0" time="0.516">
+  <testsuite name="App Component" errors="0" failures="0" skipped="0" timestamp="2026-03-01T18:31:56" time="0.235" tests="2">
+    <testcase classname="App Component can be imported without errors" name="App Component can be imported without errors" time="0.148">
     </testcase>
-    <testcase classname="API Configuration api client configuration is testable" name="API Configuration api client configuration is testable" time="0">
+    <testcase classname="App Component basic component structure exists" name="App Component basic component structure exists" time="0.001">
     </testcase>
   </testsuite>
-  <testsuite name="computeFineWeight" errors="0" failures="0" skipped="0" timestamp="2026-03-01T17:47:45" time="0.036" tests="12">
+  <testsuite name="API Configuration" errors="0" failures="0" skipped="0" timestamp="2026-03-01T18:31:56" time="0.025" tests="2">
+    <testcase classname="API Configuration axios create should be called" name="API Configuration axios create should be called" time="0">
+    </testcase>
+    <testcase classname="API Configuration api client configuration is testable" name="API Configuration api client configuration is testable" time="0.001">
+    </testcase>
+  </testsuite>
+  <testsuite name="computeFineWeight" errors="0" failures="0" skipped="0" timestamp="2026-03-01T18:31:56" time="0.035" tests="12">
     <testcase classname="computeFineWeight returns positive value for IN direction" name="computeFineWeight returns positive value for IN direction" time="0">
     </testcase>
     <testcase classname="computeFineWeight returns negative value for OUT direction" name="computeFineWeight returns negative value for OUT direction" time="0">
     </testcase>
-    <testcase classname="computeFineWeight handles zero weight" name="computeFineWeight handles zero weight" time="0.001">
+    <testcase classname="computeFineWeight handles zero weight" name="computeFineWeight handles zero weight" time="0">
     </testcase>
     <testcase classname="computeFineWeight handles 100% purity" name="computeFineWeight handles 100% purity" time="0">
     </testcase>
     <testcase classname="computeFineWeight handles Gold 24K purity (0.999)" name="computeFineWeight handles Gold 24K purity (0.999)" time="0">
     </testcase>
-    <testcase classname="computeFineWeight handles Silver 925 purity (0.925)" name="computeFineWeight handles Silver 925 purity (0.925)" time="0">
+    <testcase classname="computeFineWeight handles Silver 925 purity (0.925)" name="computeFineWeight handles Silver 925 purity (0.925)" time="0.001">
     </testcase>
     <testcase classname="getPurityLabel formats Gold 22K label correctly" name="getPurityLabel formats Gold 22K label correctly" time="0">
     </testcase>
@@ -30,12 +36,6 @@
     <testcase classname="getPurityLabel handles 100% purity without trailing zero" name="getPurityLabel handles 100% purity without trailing zero" time="0">
     </testcase>
     <testcase classname="getPurityLabel formats Platinum label correctly" name="getPurityLabel formats Platinum label correctly" time="0">
-    </testcase>
-  </testsuite>
-  <testsuite name="App Component" errors="0" failures="0" skipped="0" timestamp="2026-03-01T17:47:45" time="0.089" tests="2">
-    <testcase classname="App Component can be imported without errors" name="App Component can be imported without errors" time="0.038">
-    </testcase>
-    <testcase classname="App Component basic component structure exists" name="App Component basic component structure exists" time="0">
     </testcase>
   </testsuite>
 </testsuites>

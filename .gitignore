@@ -33,3 +33,4 @@ samconfig.toml.bak
 *.md
 !README.md
 
+coverage
