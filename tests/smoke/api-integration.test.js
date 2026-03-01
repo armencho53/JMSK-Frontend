@@ -177,7 +177,7 @@ const CRITICAL_ENDPOINTS = [
   '/roles/',
   '/contacts/',
   '/companies/',
-  '/manufacturing/steps',
+  '/department-ledger/',
   '/lookup-values/',
 ];
 
