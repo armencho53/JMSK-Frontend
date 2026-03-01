@@ -317,9 +317,9 @@ export default function DepartmentLedger() {
           </div>
           {/* Metal balance cards — only non-zero (Req 6.2) */}
           {summary.balances.map((balance) => (
-            <div key={balance.metal_type} className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+            <div key={balance.metal_id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
               <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                {balance.metal_type}
+                {balance.metal_name}
               </div>
               <div
                 className={`text-2xl font-bold mt-1 ${
@@ -376,7 +376,7 @@ export default function DepartmentLedger() {
                               : 'bg-amber-100 text-amber-800'
                           }`}
                         >
-                          {entry.metal_type}
+                          {entry.metal_name || entry.metal_code}
                         </span>
                       </td>
                       {/* IN columns (Req 7.6) */}

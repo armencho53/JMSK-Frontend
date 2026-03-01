@@ -152,10 +152,10 @@ export default function OrderDetail() {
                     {order.due_date ? new Date(order.due_date).toLocaleDateString() : '-'}
                   </dd>
                 </div>
-                {order.metal_type && (
+                {order.metal_name && (
                   <div>
                     <dt className="text-sm font-medium text-slate-600">Metal Type</dt>
-                    <dd className="mt-1 text-sm text-slate-900">{order.metal_type.replace('_', ' ')}</dd>
+                    <dd className="mt-1 text-sm text-slate-900">{order.metal_name}</dd>
                   </div>
                 )}
                 {order.target_weight_per_piece && (

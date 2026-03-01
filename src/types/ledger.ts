@@ -15,7 +15,9 @@ export interface LedgerEntry {
   department_id: number
   order_id: number
   order_number: string
-  metal_type: string
+  metal_id: number
+  metal_code: string
+  metal_name: string
   direction: 'IN' | 'OUT'
   qty_in: number | null
   qty_out: number | null
@@ -33,7 +35,7 @@ export interface LedgerEntryCreate {
   date: string
   department_id: number
   order_id: number
-  metal_type: string
+  metal_id: number
   direction: 'IN' | 'OUT'
   quantity: number
   weight: number
@@ -44,7 +46,7 @@ export interface LedgerEntryUpdate {
   date?: string
   department_id?: number
   order_id?: number
-  metal_type?: string
+  metal_id?: number
   direction?: 'IN' | 'OUT'
   quantity?: number
   weight?: number
@@ -58,7 +60,8 @@ export interface LedgerSummary {
 }
 
 export interface MetalBalanceItem {
-  metal_type: string
+  metal_id: number
+  metal_name: string
   fine_weight_balance: number
 }
 

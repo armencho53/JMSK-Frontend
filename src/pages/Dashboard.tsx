@@ -314,7 +314,7 @@ export default function Dashboard() {
                             {supply.name}
                           </p>
                           <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
-                            {supply.metal_type?.replace('_', ' ') || 'Material'}
+                            {supply.metal_name || 'Material'}
                           </p>
                         </div>
                       </div>

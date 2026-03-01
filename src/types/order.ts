@@ -31,7 +31,8 @@ export interface Order {
   due_date?: string
   
   // Metal and weight tracking
-  metal_type?: string
+  metal_id?: number
+  metal_name?: string
   target_weight_per_piece?: number
   initial_total_weight?: number
   labor_cost?: number
@@ -48,7 +49,7 @@ export interface OrderCreate {
   price?: number
   status?: string
   due_date?: string
-  metal_type?: string
+  metal_id?: number
   target_weight_per_piece?: number
   initial_total_weight?: number
   labor_cost?: number
@@ -62,7 +63,7 @@ export interface OrderUpdate {
   price?: number
   status?: string
   due_date?: string
-  metal_type?: string
+  metal_id?: number
   target_weight_per_piece?: number
   initial_total_weight?: number
   labor_cost?: number

@@ -7,7 +7,8 @@ import { Button } from '../components/ui/Button'
 
 interface DepartmentBalance {
   id: number
-  metal_type: string
+  metal_id: number
+  metal_name: string
   balance_grams: number
 }
 
@@ -88,9 +89,7 @@ export default function Departments() {
     }
   })
 
-  const formatMetalType = (metalType: string) => {
-    return metalType.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())
-  }
+
 
   if (isLoading) {
     return (
@@ -153,7 +152,7 @@ export default function Departments() {
                     <div className="space-y-1">
                       {dept.balances.map((balance) => (
                         <div key={balance.id}>
-                          {formatMetalType(balance.metal_type)}: {balance.balance_grams.toFixed(2)}g
+                          {balance.metal_name}: {balance.balance_grams.toFixed(2)}g
                         </div>
                       ))}
                     </div>

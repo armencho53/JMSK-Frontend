@@ -3,8 +3,8 @@
  *
  * Features:
  * - Department pre-filled from page filter
- * - Order searchable dropdown showing order_number — description (metal_type)
- * - Metal type auto-filled from selected order, editable dropdown from metals API
+ * - Order searchable dropdown showing order_number — description (metal_name)
+ * - Metal type auto-filled from selected order's metal_id, editable dropdown from metals API
  * - Direction IN/OUT radio toggle with green/red styling
  * - Quantity and Weight inputs
  * - Calculated fine weight display with formula
@@ -49,7 +49,7 @@ export default function LedgerEntryFormModal({
   // Form state
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<number | ''>('')
   const [selectedOrderId, setSelectedOrderId] = useState<number | ''>('')
-  const [metalType, setMetalType] = useState('')
+  const [metalId, setMetalId] = useState<number | ''>('')
   const [direction, setDirection] = useState<'IN' | 'OUT'>('IN')
   const [quantity, setQuantity] = useState('')
   const [weight, setWeight] = useState('')
@@ -96,7 +96,7 @@ export default function LedgerEntryFormModal({
     if (isEditMode && entry) {
       setSelectedDepartmentId(entry.department_id)
       setSelectedOrderId(entry.order_id)
-      setMetalType(entry.metal_type)
+      setMetalId(entry.metal_id)
       setDirection(entry.direction)
       setQuantity(
         entry.direction === 'IN'
@@ -115,7 +115,7 @@ export default function LedgerEntryFormModal({
       // Create mode
       setSelectedDepartmentId(departmentId ?? '')
       setSelectedOrderId('')
-      setMetalType('')
+      setMetalId('')
       setDirection('IN')
       setQuantity('')
       setWeight('')
@@ -142,10 +142,10 @@ export default function LedgerEntryFormModal({
     [orders, selectedOrderId]
   )
 
-  // Auto-fill metal type from selected order (Req 8.3)
+  // Auto-fill metal_id from selected order (Req 8.3)
   useEffect(() => {
-    if (selectedOrder?.metal_type) {
-      setMetalType(selectedOrder.metal_type)
+    if (selectedOrder?.metal_id) {
+      setMetalId(selectedOrder.metal_id)
     }
   }, [selectedOrder])
 
@@ -158,14 +158,14 @@ export default function LedgerEntryFormModal({
       (o) =>
         o.order_number.toLowerCase().includes(q) ||
         (o.product_description ?? '').toLowerCase().includes(q) ||
-        (o.metal_type ?? '').toLowerCase().includes(q)
+        (o.metal_name ?? '').toLowerCase().includes(q)
     )
   }, [orders, orderSearch])
 
   // Current metal object for fine weight calculation
   const currentMetal = useMemo(
-    () => metals?.find((m) => m.code === metalType) ?? null,
-    [metals, metalType]
+    () => metals?.find((m) => m.id === metalId) ?? null,
+    [metals, metalId]
   )
 
   // Calculated fine weight (Req 8.4, 8.5)
@@ -207,7 +207,7 @@ export default function LedgerEntryFormModal({
     const newErrors: Record<string, string> = {}
     if (!selectedDepartmentId) newErrors.department = 'Department is required'
     if (!selectedOrderId) newErrors.order = 'Order is required'
-    if (!metalType) newErrors.metalType = 'Metal type is required'
+    if (!metalId) newErrors.metalType = 'Metal type is required'
     if (!quantity || parseFloat(quantity) <= 0) newErrors.quantity = 'Quantity must be positive'
     if (!weight || parseFloat(weight) <= 0) newErrors.weight = 'Weight must be positive'
     if (!date) newErrors.date = 'Date is required'
@@ -224,7 +224,7 @@ export default function LedgerEntryFormModal({
         date,
         department_id: selectedDepartmentId as number,
         order_id: selectedOrderId as number,
-        metal_type: metalType,
+        metal_id: metalId as number,
         direction,
         quantity: parseFloat(quantity),
         weight: parseFloat(weight),
@@ -236,7 +236,7 @@ export default function LedgerEntryFormModal({
         date,
         department_id: selectedDepartmentId as number,
         order_id: selectedOrderId as number,
-        metal_type: metalType,
+        metal_id: metalId as number,
         direction,
         quantity: parseFloat(quantity),
         weight: parseFloat(weight),
@@ -249,7 +249,7 @@ export default function LedgerEntryFormModal({
   // Format order label for dropdown (Req 8.2)
   const formatOrderLabel = (order: Order) => {
     const desc = order.product_description ? ` — ${order.product_description}` : ''
-    const metal = order.metal_type ? ` (${order.metal_type})` : ''
+    const metal = order.metal_name ? ` (${order.metal_name})` : ''
     return `${order.order_number}${desc}${metal}`
   }
 
@@ -380,15 +380,15 @@ export default function LedgerEntryFormModal({
                 </label>
                 <select
                   id="ledger-metal-type"
-                  value={metalType}
-                  onChange={(e) => setMetalType(e.target.value)}
+                  value={metalId}
+                  onChange={(e) => setMetalId(e.target.value ? Number(e.target.value) : '')}
                   className={`mt-1 block w-full border ${
                     errors.metalType ? 'border-red-300' : 'border-gray-300'
                   } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                 >
                   <option value="">Select metal type</option>
                   {metals?.filter((m) => m.is_active).map((metal) => (
-                    <option key={metal.id} value={metal.code}>
+                    <option key={metal.id} value={metal.id}>
                       {metal.name} ({metal.code})
                     </option>
                   ))}
