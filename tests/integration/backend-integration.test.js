@@ -165,7 +165,7 @@ async function testAPIEndpoints(page) {
   log('Testing API endpoints accessibility...');
   
   const endpoints = [
-    '/api/v1/customers',
+    '/api/v1/contacts',
     '/api/v1/orders',
     '/api/v1/companies',
     '/api/v1/roles'
