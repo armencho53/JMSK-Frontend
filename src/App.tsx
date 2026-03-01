@@ -9,7 +9,7 @@ import Companies from './pages/Companies'
 import CompanyDetail from './pages/CompanyDetail'
 import Orders from './pages/Orders'
 import OrderDetail from './pages/OrderDetail'
-import Manufacturing from './pages/Manufacturing'
+import DepartmentLedger from './pages/DepartmentLedger'
 import Shipments from './pages/Shipments'
 import Roles from './pages/Roles'
 import Departments from './pages/Departments'
@@ -61,7 +61,7 @@ function App() {
               <Route path="companies/:companyId" element={<CompanyDetail />} />
               <Route path="orders" element={<Orders />} />
               <Route path="orders/:orderId" element={<OrderDetail />} />
-              <Route path="manufacturing" element={<Manufacturing />} />
+              <Route path="department-ledger" element={<DepartmentLedger />} />
               <Route path="departments" element={<Departments />} />
               <Route path="shipments" element={<Shipments />} />
               <Route path="roles" element={<Roles />} />
