@@ -208,8 +208,8 @@ export default function LedgerEntryFormModal({
     if (!selectedDepartmentId) newErrors.department = 'Department is required'
     if (!selectedOrderId) newErrors.order = 'Order is required'
     if (!metalId) newErrors.metalType = 'Metal type is required'
-    if (parseFloat(quantity || '0') < 0) newErrors.quantity = 'Quantity must be non-negative'
-    if (parseFloat(weight || '0') < 0) newErrors.weight = 'Weight must be non-negative'
+    if (!quantity || parseFloat(quantity) <= 0) newErrors.quantity = 'Quantity must be positive'
+    if (!weight || parseFloat(weight) <= 0) newErrors.weight = 'Weight must be positive'
     if (!date) newErrors.date = 'Date is required'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -226,8 +226,8 @@ export default function LedgerEntryFormModal({
         order_id: selectedOrderId as number,
         metal_id: metalId as number,
         direction,
-        quantity: parseFloat(quantity) || 0,
-        weight: parseFloat(weight) || 0,
+        quantity: parseFloat(quantity),
+        weight: parseFloat(weight),
         notes: notes.trim() || undefined,
       }
       updateMutation.mutate(data)
@@ -238,8 +238,8 @@ export default function LedgerEntryFormModal({
         order_id: selectedOrderId as number,
         metal_id: metalId as number,
         direction,
-        quantity: parseFloat(quantity) || 0,
-        weight: parseFloat(weight) || 0,
+        quantity: parseFloat(quantity),
+        weight: parseFloat(weight),
         notes: notes.trim() || undefined,
       }
       createMutation.mutate(data)
