@@ -28,7 +28,7 @@ const navigationItems: NavigationItem[] = [
   { name: 'Contacts', href: '/contacts', icon: UserGroupIcon },
   { name: 'Companies', href: '/companies', icon: BuildingOfficeIcon },
   { name: 'Orders', href: '/orders', icon: ClipboardDocumentListIcon },
-  { name: 'Manufacturing', href: '/manufacturing', icon: CogIcon },
+  { name: 'Dept. Ledger', href: '/department-ledger', icon: CogIcon },
   { name: 'Departments', href: '/departments', icon: BuildingOfficeIcon },
   { name: 'Shipments', href: '/shipments', icon: TruckIcon },
   { name: 'Roles', href: '/roles', icon: UserIcon },

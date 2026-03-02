@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import ContactSelector from './ContactSelector'
 import type { Order } from '../types/order'
 import type { Contact } from '../types/contact'
-import { useLookupValues } from '../lib/useLookupValues'
+import { useMetals } from '../hooks/useMetals'
 import { ORDER_STATUS_OPTIONS } from '../lib/constants'
 
 interface OrderFormModalProps {
@@ -22,7 +22,7 @@ interface OrderFormData {
   price?: number
   status?: string
   due_date?: string
-  metal_type?: string
+  metal_id?: number
   target_weight_per_piece?: number
   initial_total_weight?: number
   labor_cost?: number
@@ -42,7 +42,7 @@ export default function OrderFormModal({
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [selectedContact, setSelectedContact] = useState<Contact | undefined>()
-  const { options: metalTypeOptions, isLoading: metalTypeLoading, isError: metalTypeError, refetch: refetchMetalTypes } = useLookupValues('metal_type')
+  const { metals, isLoading: metalTypeLoading, isError: metalTypeError, refetch: refetchMetalTypes } = useMetals()
 
   useEffect(() => {
     if (isOpen) {
@@ -55,7 +55,7 @@ export default function OrderFormModal({
           price: order.price,
           status: order.status,
           due_date: order.due_date ? order.due_date.slice(0, 16) : '',
-          metal_type: order.metal_type,
+          metal_id: order.metal_id,
           target_weight_per_piece: order.target_weight_per_piece,
           initial_total_weight: order.initial_total_weight,
           labor_cost: order.labor_cost,
@@ -378,17 +378,17 @@ export default function OrderFormModal({
                     ) : (
                       <select
                         id="metal-type"
-                        value={formData.metal_type || ''}
-                        onChange={(e) => setFormData({ ...formData, metal_type: e.target.value || undefined })}
+                        value={formData.metal_id ?? ''}
+                        onChange={(e) => setFormData({ ...formData, metal_id: e.target.value ? Number(e.target.value) : undefined })}
                         disabled={metalTypeLoading}
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm disabled:opacity-50"
                       >
                         <option value="">
                           {metalTypeLoading ? 'Loading...' : 'Select metal type'}
                         </option>
-                        {metalTypeOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
+                        {metals.map((metal) => (
+                          <option key={metal.id} value={metal.id}>
+                            {metal.name}
                           </option>
                         ))}
                       </select>

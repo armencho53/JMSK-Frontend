@@ -69,6 +69,7 @@ export function useMetals(includeInactive = false) {
     metals: query.data || [],
     isLoading: query.isLoading,
     isError: query.isError,
+    refetch: query.refetch,
     createMetal: createMutation,
     updateMetal: updateMutation,
     deactivateMetal: deactivateMutation,

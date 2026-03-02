@@ -10,7 +10,7 @@ export default function Layout() {
     { name: 'Supplies', href: '/supplies', icon: '📦' },
     { name: 'Companies', href: '/companies', icon: '🏢' },
     { name: 'Orders', href: '/orders', icon: '📋' },
-    { name: 'Manufacturing', href: '/manufacturing', icon: '⚙️' },
+    { name: 'Ledger', href: '/department-ledger', icon: '⚙️' },
     { name: 'Shipments', href: '/shipments', icon: '🚚' },
     { name: 'Departments', href: '/departments', icon: '🏭' },
     { name: 'Roles', href: '/roles', icon: '🔐' },
