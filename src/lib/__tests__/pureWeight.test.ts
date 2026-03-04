@@ -1,30 +1,30 @@
-import { computeFineWeight, getPurityLabel } from '../fineWeight';
+import { computePureWeight, getPurityLabel } from '../pureWeight';
 
-describe('computeFineWeight', () => {
+describe('computePureWeight', () => {
   test('returns positive value for IN direction', () => {
-    expect(computeFineWeight(28.9, 0.916, 'IN')).toBeCloseTo(26.4724);
+    expect(computePureWeight(28.9, 0.916, 'IN')).toBeCloseTo(26.4724);
   });
 
   test('returns negative value for OUT direction', () => {
-    expect(computeFineWeight(28.9, 0.916, 'OUT')).toBeCloseTo(-26.4724);
+    expect(computePureWeight(28.9, 0.916, 'OUT')).toBeCloseTo(-26.4724);
   });
 
   test('handles zero weight', () => {
-    expect(computeFineWeight(0, 0.916, 'IN')).toBe(0);
-    expect(computeFineWeight(0, 0.916, 'OUT')).toBe(-0);
+    expect(computePureWeight(0, 0.916, 'IN')).toBe(0);
+    expect(computePureWeight(0, 0.916, 'OUT')).toBe(-0);
   });
 
   test('handles 100% purity', () => {
-    expect(computeFineWeight(10, 1.0, 'IN')).toBeCloseTo(10);
-    expect(computeFineWeight(10, 1.0, 'OUT')).toBeCloseTo(-10);
+    expect(computePureWeight(10, 1.0, 'IN')).toBeCloseTo(10);
+    expect(computePureWeight(10, 1.0, 'OUT')).toBeCloseTo(-10);
   });
 
   test('handles Gold 24K purity (0.999)', () => {
-    expect(computeFineWeight(50, 0.999, 'IN')).toBeCloseTo(49.95);
+    expect(computePureWeight(50, 0.999, 'IN')).toBeCloseTo(49.95);
   });
 
   test('handles Silver 925 purity (0.925)', () => {
-    expect(computeFineWeight(100, 0.925, 'OUT')).toBeCloseTo(-92.5);
+    expect(computePureWeight(100, 0.925, 'OUT')).toBeCloseTo(-92.5);
   });
 });
 

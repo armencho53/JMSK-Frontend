@@ -328,7 +328,7 @@ export default function DepartmentLedger() {
               >
                 {balance.fine_weight_balance.toFixed(3)}g
               </div>
-              <div className="text-xs text-slate-400 mt-1">fine weight</div>
+              <div className="text-xs text-slate-400 mt-1">pure weight</div>
             </div>
           ))}
         </div>
@@ -348,7 +348,7 @@ export default function DepartmentLedger() {
                 <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider bg-red-50 border-l border-red-200">Qty Out</th>
                 <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider bg-red-50">Weight Out</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider border-l border-slate-200">Notes</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider bg-amber-50 border-l border-amber-200">Fine Weight</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider bg-amber-50 border-l border-amber-200">Pure Weight</th>
                 <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wider border-l border-slate-200">Actions</th>
               </tr>
             </thead>
@@ -416,7 +416,7 @@ export default function DepartmentLedger() {
                         )}
                         {entry.notes || ''}
                       </td>
-                      {/* Fine Weight (Req 7.9) */}
+                      {/* Pure Weight (Req 7.9) */}
                       <td className={`px-4 py-3 text-sm text-right font-medium bg-amber-50/50 border-l border-amber-100 ${
                         isArchived
                           ? 'text-slate-400'

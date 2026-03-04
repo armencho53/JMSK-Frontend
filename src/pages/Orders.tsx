@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import api from '../lib/api'
+import api, { createOrderWithDeposit } from '../lib/api'
 import { showSuccessToast, showErrorToast } from '../lib/toast'
 import OrderFormModal from '../components/OrderFormModal'
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal'
@@ -10,7 +10,7 @@ import { Container } from '../components/ui/Container'
 import { StatusBadge } from '../components/ui/Status'
 import { Table, TableColumn } from '../components/ui/Table'
 import { Button } from '../components/ui/Button'
-import { Order } from '../types/order'
+import { Order, OrderCreateWithDeposit } from '../types/order'
 
 // Define table columns for orders
 const getOrderColumns = (
@@ -59,16 +59,32 @@ const getOrderColumns = (
   {
     key: 'product_description',
     title: 'Product',
-    dataIndex: 'product_description',
-    responsive: 'tablet'
+    responsive: 'tablet',
+    render: (_, record: Order) => {
+      // Show line items if available, otherwise fall back to deprecated single-line fields
+      if (record.line_items && record.line_items.length > 0) {
+        if (record.line_items.length === 1) {
+          return record.line_items[0].product_description
+        }
+        return `${record.line_items[0].product_description} (+${record.line_items.length - 1} more)`
+      }
+      return record.product_description || '-'
+    }
   },
   {
     key: 'quantity',
     title: 'Qty',
-    dataIndex: 'quantity',
     sortable: true,
     align: 'center' as const,
-    width: 80
+    width: 80,
+    render: (_, record: Order) => {
+      // Sum quantities from line items if available
+      if (record.line_items && record.line_items.length > 0) {
+        const totalQty = record.line_items.reduce((sum, item) => sum + item.quantity, 0)
+        return totalQty
+      }
+      return record.quantity || 0
+    }
   },
   {
     key: 'price',
@@ -168,9 +184,8 @@ export default function Orders() {
   })
 
   const createOrderMutation = useMutation({
-    mutationFn: async (orderData: any) => {
-      const response = await api.post('/orders/', orderData)
-      return response.data
+    mutationFn: async (orderData: OrderCreateWithDeposit) => {
+      return await createOrderWithDeposit(orderData)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['orders'] })

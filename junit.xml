@@ -1,23 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="jest tests" tests="16" failures="0" errors="0" time="0.61">
-  <testsuite name="API Configuration" errors="0" failures="0" skipped="0" timestamp="2026-03-01T18:54:35" time="0.171" tests="2">
-    <testcase classname="API Configuration axios create should be called" name="API Configuration axios create should be called" time="0.001">
+<testsuites name="jest tests" tests="16" failures="0" errors="0" time="0.658">
+  <testsuite name="App Component" errors="0" failures="0" skipped="0" timestamp="2026-03-04T19:08:16" time="0.228" tests="2">
+    <testcase classname="App Component can be imported without errors" name="App Component can be imported without errors" time="0.045">
     </testcase>
-    <testcase classname="API Configuration api client configuration is testable" name="API Configuration api client configuration is testable" time="0.001">
+    <testcase classname="App Component basic component structure exists" name="App Component basic component structure exists" time="0">
     </testcase>
   </testsuite>
-  <testsuite name="computeFineWeight" errors="0" failures="0" skipped="0" timestamp="2026-03-01T18:54:35" time="0.179" tests="12">
-    <testcase classname="computeFineWeight returns positive value for IN direction" name="computeFineWeight returns positive value for IN direction" time="0.002">
+  <testsuite name="API Configuration" errors="0" failures="0" skipped="0" timestamp="2026-03-04T19:08:16" time="0.035" tests="2">
+    <testcase classname="API Configuration axios create should be called" name="API Configuration axios create should be called" time="0.001">
     </testcase>
-    <testcase classname="computeFineWeight returns negative value for OUT direction" name="computeFineWeight returns negative value for OUT direction" time="0">
+    <testcase classname="API Configuration api client configuration is testable" name="API Configuration api client configuration is testable" time="0">
     </testcase>
-    <testcase classname="computeFineWeight handles zero weight" name="computeFineWeight handles zero weight" time="0.001">
+  </testsuite>
+  <testsuite name="computePureWeight" errors="0" failures="0" skipped="0" timestamp="2026-03-04T19:08:16" time="0.026" tests="12">
+    <testcase classname="computePureWeight returns positive value for IN direction" name="computePureWeight returns positive value for IN direction" time="0.001">
     </testcase>
-    <testcase classname="computeFineWeight handles 100% purity" name="computeFineWeight handles 100% purity" time="0">
+    <testcase classname="computePureWeight returns negative value for OUT direction" name="computePureWeight returns negative value for OUT direction" time="0">
     </testcase>
-    <testcase classname="computeFineWeight handles Gold 24K purity (0.999)" name="computeFineWeight handles Gold 24K purity (0.999)" time="0">
+    <testcase classname="computePureWeight handles zero weight" name="computePureWeight handles zero weight" time="0">
     </testcase>
-    <testcase classname="computeFineWeight handles Silver 925 purity (0.925)" name="computeFineWeight handles Silver 925 purity (0.925)" time="0">
+    <testcase classname="computePureWeight handles 100% purity" name="computePureWeight handles 100% purity" time="0">
+    </testcase>
+    <testcase classname="computePureWeight handles Gold 24K purity (0.999)" name="computePureWeight handles Gold 24K purity (0.999)" time="0.001">
+    </testcase>
+    <testcase classname="computePureWeight handles Silver 925 purity (0.925)" name="computePureWeight handles Silver 925 purity (0.925)" time="0">
     </testcase>
     <testcase classname="getPurityLabel formats Gold 22K label correctly" name="getPurityLabel formats Gold 22K label correctly" time="0">
     </testcase>
@@ -30,12 +36,6 @@
     <testcase classname="getPurityLabel handles 100% purity without trailing zero" name="getPurityLabel handles 100% purity without trailing zero" time="0">
     </testcase>
     <testcase classname="getPurityLabel formats Platinum label correctly" name="getPurityLabel formats Platinum label correctly" time="0">
-    </testcase>
-  </testsuite>
-  <testsuite name="App Component" errors="0" failures="0" skipped="0" timestamp="2026-03-01T18:54:35" time="0.205" tests="2">
-    <testcase classname="App Component can be imported without errors" name="App Component can be imported without errors" time="0.03">
-    </testcase>
-    <testcase classname="App Component basic component structure exists" name="App Component basic component structure exists" time="0.001">
     </testcase>
   </testsuite>
 </testsuites>

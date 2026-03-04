@@ -2,7 +2,7 @@
  * Ledger type definitions for the Department Ledger system.
  *
  * Ledger entries track metal moving IN to or OUT of a department,
- * linked to an order. Fine weight is computed server-side using
+ * linked to an order. Pure weight is computed server-side using
  * the purity factor from the tenant's metals table.
  *
  * Requirements: 1.1, 1.2, 6.1, 10.1
