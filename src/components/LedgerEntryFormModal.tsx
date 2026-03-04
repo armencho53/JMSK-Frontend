@@ -7,7 +7,7 @@
  * - Metal type auto-filled from selected order's metal_id, editable dropdown from metals API
  * - Direction IN/OUT radio toggle with green/red styling
  * - Quantity and Weight inputs
- * - Calculated fine weight display with formula
+ * - Calculated pure weight display with formula
  * - Date defaults to today, Notes textarea
  * - Handles both create and edit modes
  *
@@ -17,7 +17,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import api from '../lib/api'
 import { createLedgerEntry, updateLedgerEntry } from '../lib/ledgerApi'
-import { computeFineWeight, getPurityLabel } from '../lib/fineWeight'
+import { computePureWeight, getPurityLabel } from '../lib/pureWeight'
 import { showSuccessToast, showErrorToast } from '../lib/toast'
 import type { LedgerEntry, LedgerEntryCreate, LedgerEntryUpdate } from '../types/ledger'
 import type { Metal } from '../types/metal'
@@ -162,17 +162,17 @@ export default function LedgerEntryFormModal({
     )
   }, [orders, orderSearch])
 
-  // Current metal object for fine weight calculation
+  // Current metal object for pure weight calculation
   const currentMetal = useMemo(
     () => metals?.find((m) => m.id === metalId) ?? null,
     [metals, metalId]
   )
 
-  // Calculated fine weight (Req 8.4, 8.5)
+  // Calculated pure weight (Req 8.4, 8.5)
   const weightNum = parseFloat(weight) || 0
-  const fineWeightValue =
+  const pureWeightValue =
     currentMetal && weightNum > 0
-      ? computeFineWeight(weightNum, currentMetal.fine_percentage, direction)
+      ? computePureWeight(weightNum, currentMetal.fine_percentage, direction)
       : null
   const purityLabel =
     currentMetal ? getPurityLabel(currentMetal.name, currentMetal.fine_percentage) : null
@@ -471,20 +471,20 @@ export default function LedgerEntryFormModal({
                 </div>
               </div>
 
-              {/* Calculated Fine Weight display (Req 8.4, 8.5) */}
-              {fineWeightValue !== null && purityLabel && (
+              {/* Calculated Pure Weight display (Req 8.4, 8.5) */}
+              {pureWeightValue !== null && purityLabel && (
                 <div className={`rounded-md p-3 border ${
                   direction === 'IN'
                     ? 'bg-green-50 border-green-200'
                     : 'bg-red-50 border-red-200'
                 }`}>
                   <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
-                    Fine Weight
+                    Pure Weight
                   </div>
                   <div className={`text-lg font-bold ${
                     direction === 'IN' ? 'text-green-700' : 'text-red-700'
                   }`}>
-                    {direction === 'IN' ? '+' : '−'}{Math.abs(fineWeightValue).toFixed(3)}g
+                    {direction === 'IN' ? '+' : '−'}{Math.abs(pureWeightValue).toFixed(3)}g
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
                     = {weightNum.toFixed(3)}g × {purityLabel}

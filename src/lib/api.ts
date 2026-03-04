@@ -408,7 +408,7 @@ export const seedLookupDefaults = async (): Promise<void> => {
 // Metal API Functions
 // ============================================================================
 
-import type { Metal, MetalCreate, MetalUpdate } from '../types/metal'
+import type { Metal, MetalCreate, MetalUpdate, MetalPriceResponse } from '../types/metal'
 
 export const fetchMetals = async (includeInactive?: boolean): Promise<Metal[]> => {
   const params: Record<string, boolean> = {}
@@ -429,6 +429,22 @@ export const updateMetal = async (id: number, data: MetalUpdate): Promise<Metal>
 
 export const deactivateMetal = async (id: number): Promise<void> => {
   await api.delete(`/metals/${id}`)
+}
+
+/**
+ * Get current market price for a metal type
+ * Returns null if API is unavailable (non-blocking)
+ * Requirements: 8.1, 8.2, 8.4
+ */
+export const getMetalPrice = async (metalCode: string): Promise<MetalPriceResponse | null> => {
+  try {
+    const response = await api.get(`/metals/price/${metalCode}`)
+    return response.data
+  } catch (error) {
+    // Non-blocking: return null on error to allow manual entry
+    console.warn(`Failed to fetch metal price for ${metalCode}:`, error)
+    return null
+  }
 }
 
 // ============================================================================
@@ -457,4 +473,64 @@ export const fetchCompanyMetalBalances = async (companyId: number): Promise<Comp
 export const recordMetalDeposit = async (companyId: number, data: MetalDepositCreate): Promise<any> => {
   const response = await api.post(`/companies/${companyId}/metal-deposits`, data)
   return response.data
+}
+
+/**
+ * Create a company metal deposit (alias for recordMetalDeposit)
+ * Requirements: 2.1, 2.2, 2.3
+ */
+export const createCompanyMetalDeposit = recordMetalDeposit
+
+// ============================================================================
+// Order API Functions
+// ============================================================================
+
+import type { OrderCreateWithDeposit, OrderUpdate } from '../types/order'
+
+/**
+ * Create a new order with line items and optional metal deposit
+ * Requirements: 3.9, 5.8
+ */
+export const createOrderWithDeposit = async (data: OrderCreateWithDeposit): Promise<Order> => {
+  const response = await api.post('/orders', data)
+  return response.data
+}
+
+/**
+ * Update an existing order with line items
+ * Requirements: 3.9
+ */
+export const updateOrder = async (id: number, data: OrderUpdate): Promise<Order> => {
+  const response = await api.put(`/orders/${id}`, data)
+  return response.data
+}
+
+/**
+ * Fetch a single order by ID with line items
+ * Requirements: 3.9, 3.10
+ */
+export const getOrder = async (id: number): Promise<Order> => {
+  const response = await api.get(`/orders/${id}`)
+  return response.data
+}
+
+/**
+ * Fetch all orders with optional filtering
+ */
+export const fetchOrders = async (params?: {
+  skip?: number
+  limit?: number
+  status?: string
+  company_id?: number
+  contact_id?: number
+}): Promise<Order[]> => {
+  const response = await api.get('/orders', { params })
+  return response.data
+}
+
+/**
+ * Delete an order
+ */
+export const deleteOrder = async (id: number): Promise<void> => {
+  await api.delete(`/orders/${id}`)
 }

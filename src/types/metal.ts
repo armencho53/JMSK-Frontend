@@ -23,3 +23,15 @@ export interface MetalUpdate {
   average_cost_per_gram?: number | null
   is_active?: boolean
 }
+
+/**
+ * Metal price response from price lookup API
+ * Requirements: 8.1, 8.2, 8.8
+ */
+export interface MetalPriceResponse {
+  metal_code: string
+  price_per_gram: number
+  currency: string
+  fetched_at: string
+  cached: boolean
+}
