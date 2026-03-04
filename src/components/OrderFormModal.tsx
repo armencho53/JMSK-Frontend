@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import ContactSelector from './ContactSelector'
 import OrderLineItemRow from './OrderLineItemRow'
-import type { Order, OrderLineItem, MetalDepositCreate, OrderCreateWithDeposit } from '../types/order'
+import type { Order, OrderLineItem, MetalDepositCreate } from '../types/order'
 import type { Contact } from '../types/contact'
 import { useMetals } from '../hooks/useMetals'
 import { ORDER_STATUS_OPTIONS } from '../lib/constants'
