@@ -165,10 +165,10 @@ async function testAPIEndpoints(page) {
   log('Testing API endpoints accessibility...');
   
   const endpoints = [
-    '/api/v1/contacts',
-    '/api/v1/orders',
-    '/api/v1/companies',
-    '/api/v1/roles'
+    '/api/v1/contacts/',
+    '/api/v1/orders/',
+    '/api/v1/companies/',
+    '/api/v1/roles/'
   ];
   
   const endpointResults = [];
@@ -179,7 +179,8 @@ async function testAPIEndpoints(page) {
         method: 'GET',
         headers: {
           'Accept': 'application/json'
-        }
+        },
+        redirect: 'follow'
       });
       
       // 401 is acceptable (not authenticated), 200 is good, 404 means endpoint doesn't exist

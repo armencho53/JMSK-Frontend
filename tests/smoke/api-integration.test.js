@@ -104,7 +104,8 @@ async function testEndpointReachable(endpoint) {
       headers: {
         'Origin': FRONTEND_ORIGIN,
         'Accept': 'application/json'
-      }
+      },
+      redirect: 'follow'
     });
 
     const allowOrigin = res.headers.get('access-control-allow-origin');
