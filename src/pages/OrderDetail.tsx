@@ -133,50 +133,89 @@ export default function OrderDetail() {
           <Card variant="elevated">
             <CardContent>
               <h2 className="text-lg font-semibold text-slate-900 mb-4">Order Details</h2>
-              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <dt className="text-sm font-medium text-slate-600">Product Description</dt>
-                  <dd className="mt-1 text-sm text-slate-900">{order.product_description || '-'}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-slate-600">Quantity</dt>
-                  <dd className="mt-1 text-sm text-slate-900">{order.quantity || '-'}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium text-slate-600">Price</dt>
-                  <dd className="mt-1 text-sm text-slate-900">${order.price?.toFixed(2) || '0.00'}</dd>
-                </div>
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
                   <dt className="text-sm font-medium text-slate-600">Due Date</dt>
                   <dd className="mt-1 text-sm text-slate-900">
                     {order.due_date ? new Date(order.due_date).toLocaleDateString() : '-'}
                   </dd>
                 </div>
-                {order.metal_name && (
-                  <div>
-                    <dt className="text-sm font-medium text-slate-600">Metal Type</dt>
-                    <dd className="mt-1 text-sm text-slate-900">{order.metal_name}</dd>
-                  </div>
-                )}
-                {order.target_weight_per_piece && (
-                  <div>
-                    <dt className="text-sm font-medium text-slate-600">Target Weight/Piece</dt>
-                    <dd className="mt-1 text-sm text-slate-900">{order.target_weight_per_piece}g</dd>
-                  </div>
-                )}
-                {order.initial_total_weight && (
-                  <div>
-                    <dt className="text-sm font-medium text-slate-600">Initial Total Weight</dt>
-                    <dd className="mt-1 text-sm text-slate-900">{order.initial_total_weight}g</dd>
-                  </div>
-                )}
-                {order.specifications && (
-                  <div className="sm:col-span-2">
-                    <dt className="text-sm font-medium text-slate-600">Specifications</dt>
-                    <dd className="mt-1 text-sm text-slate-900">{order.specifications}</dd>
-                  </div>
-                )}
               </dl>
+
+              {order.line_items && order.line_items.length > 0 ? (
+                <>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-2">Line Items</h3>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead>
+                        <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Product Description</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Specifications</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Metal Type</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Qty</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Target Wt/Pc (g)</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Initial Total Wt (g)</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Price</th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-slate-600 uppercase tracking-wider">Labor Cost</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {order.line_items.map((item, index) => (
+                          <tr key={item.id ?? index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                            <td className="px-3 py-2 text-sm text-slate-900">{item.product_description || '-'}</td>
+                            <td className="px-3 py-2 text-sm text-slate-900">{item.specifications || '-'}</td>
+                            <td className="px-3 py-2 text-sm text-slate-900">{item.metal_name || '-'}</td>
+                            <td className="px-3 py-2 text-sm text-slate-900">{item.quantity ?? '-'}</td>
+                            <td className="px-3 py-2 text-sm text-slate-900">{item.target_weight_per_piece != null ? item.target_weight_per_piece : '-'}</td>
+                            <td className="px-3 py-2 text-sm text-slate-900">{item.initial_total_weight != null ? item.initial_total_weight : '-'}</td>
+                            <td className="px-3 py-2 text-sm text-slate-900">{item.price != null ? `$${item.price.toFixed(2)}` : '-'}</td>
+                            <td className="px-3 py-2 text-sm text-slate-900">{item.labor_cost != null ? `$${item.labor_cost.toFixed(2)}` : '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              ) : (order.product_description || order.specifications || order.quantity || order.price) ? (
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <dt className="text-sm font-medium text-slate-600">Product Description</dt>
+                    <dd className="mt-1 text-sm text-slate-900">{order.product_description || '-'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-slate-600">Quantity</dt>
+                    <dd className="mt-1 text-sm text-slate-900">{order.quantity || '-'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-slate-600">Price</dt>
+                    <dd className="mt-1 text-sm text-slate-900">${order.price?.toFixed(2) || '0.00'}</dd>
+                  </div>
+                  {order.metal_name && (
+                    <div>
+                      <dt className="text-sm font-medium text-slate-600">Metal Type</dt>
+                      <dd className="mt-1 text-sm text-slate-900">{order.metal_name}</dd>
+                    </div>
+                  )}
+                  {order.target_weight_per_piece && (
+                    <div>
+                      <dt className="text-sm font-medium text-slate-600">Target Weight/Piece</dt>
+                      <dd className="mt-1 text-sm text-slate-900">{order.target_weight_per_piece}g</dd>
+                    </div>
+                  )}
+                  {order.initial_total_weight && (
+                    <div>
+                      <dt className="text-sm font-medium text-slate-600">Initial Total Weight</dt>
+                      <dd className="mt-1 text-sm text-slate-900">{order.initial_total_weight}g</dd>
+                    </div>
+                  )}
+                  {order.specifications && (
+                    <div className="sm:col-span-2">
+                      <dt className="text-sm font-medium text-slate-600">Specifications</dt>
+                      <dd className="mt-1 text-sm text-slate-900">{order.specifications}</dd>
+                    </div>
+                  )}
+                </dl>
+              ) : null}
             </CardContent>
           </Card>
 
