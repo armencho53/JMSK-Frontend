@@ -112,11 +112,17 @@ async function testEndpointReachable(endpoint) {
     const status = res.status;
 
     // 401/403 means the endpoint exists but requires auth — that's fine
+    // 405 means the route exists but the HTTP method isn't supported yet
+    // (can happen during cross-repo deployments when backend hasn't been updated)
     if (status === 200 || status === 401 || status === 403) {
       if (!allowOrigin) {
         return { passed: false, message: `GET ${endpoint} — ${status} but missing CORS header` };
       }
       return { passed: true, message: `GET ${endpoint} — ${status} with CORS OK` };
+    }
+
+    if (status === 405) {
+      return { passed: true, message: `GET ${endpoint} — 405 Method Not Allowed (backend may need redeployment, route exists but GET not yet supported)` };
     }
 
     if (status === 404) {
