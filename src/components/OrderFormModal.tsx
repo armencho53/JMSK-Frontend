@@ -246,7 +246,7 @@ export default function OrderFormModal({
           &#8203;
         </span>
 
-        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full">
           {/* Modal Header with Border */}
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
@@ -369,19 +369,36 @@ export default function OrderFormModal({
                   {errors.line_items && (
                     <p className="mb-3 text-sm text-red-600">{errors.line_items}</p>
                   )}
-                  <div className="space-y-4">
-                    {formData.line_items.map((lineItem, index) => (
-                      <OrderLineItemRow
-                        key={index}
-                        lineItem={lineItem}
-                        index={index}
-                        metals={metals}
-                        onChange={updateLineItem}
-                        onRemove={removeLineItem}
-                        canRemove={formData.line_items.length > 1}
-                        errors={errors}
-                      />
-                    ))}
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead>
+                        <tr>
+                          <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Description</th>
+                          <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Specifications</th>
+                          <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metal Type</th>
+                          <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
+                          <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Target Wt/Pc</th>
+                          <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Initial Total Wt</th>
+                          <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                          <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Labor Cost</th>
+                          <th className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {formData.line_items.map((lineItem, index) => (
+                          <OrderLineItemRow
+                            key={index}
+                            lineItem={lineItem}
+                            index={index}
+                            metals={metals}
+                            onChange={updateLineItem}
+                            onRemove={removeLineItem}
+                            canRemove={formData.line_items.length > 1}
+                            errors={errors}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
 
