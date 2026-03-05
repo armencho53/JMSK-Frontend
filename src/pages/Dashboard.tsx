@@ -14,7 +14,7 @@ export default function Dashboard() {
   const { data: orders, isLoading: ordersLoading, error: ordersError } = useQuery({
     queryKey: ['orders'],
     queryFn: async () => {
-      const response = await api.get('/orders/')
+      const response = await api.get('/orders-legacy/')
       return response.data
     }
   })
