@@ -112,12 +112,14 @@ export default function OrderDetail() {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button
-              variant="primary"
-              onClick={() => setIsEditModalOpen(true)}
-            >
-              Edit
-            </Button>
+            {order.status === 'PENDING' && (
+              <Button
+                variant="primary"
+                onClick={() => setIsEditModalOpen(true)}
+              >
+                Edit
+              </Button>
+            )}
             <Button
               variant="danger"
               onClick={() => setIsDeleteModalOpen(true)}

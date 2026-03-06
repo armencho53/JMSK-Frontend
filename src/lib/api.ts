@@ -141,7 +141,7 @@ export const fetchContacts = async (params?: {
   search?: string
   company_id?: number
 }): Promise<Contact[]> => {
-  const response = await api.get('/contacts', { params })
+  const response = await api.get('/contacts/', { params })
   return response.data
 }
 
@@ -157,7 +157,7 @@ export const fetchContactById = async (id: number): Promise<Contact> => {
  * Create a new contact
  */
 export const createContact = async (data: ContactCreate): Promise<Contact> => {
-  const response = await api.post('/contacts', data)
+  const response = await api.post('/contacts/', data)
   return response.data
 }
 
@@ -200,7 +200,7 @@ export const fetchCompanies = async (params?: {
   search?: string
   include_balance?: boolean
 }): Promise<Company[]> => {
-  const response = await api.get('/companies-v2', { params })
+  const response = await api.get('/companies-v2/', { params })
   return response.data
 }
 
@@ -219,7 +219,7 @@ export const fetchCompanyById = async (
  * Create a new company
  */
 export const createCompany = async (data: CompanyCreate): Promise<Company> => {
-  const response = await api.post('/companies-v2', data)
+  const response = await api.post('/companies-v2/', data)
   return response.data
 }
 
@@ -370,7 +370,7 @@ export const fetchLookupValues = async (
   const params: Record<string, string | boolean> = {}
   if (category) params.category = category
   if (includeInactive) params.include_inactive = true
-  const response = await api.get('/lookup-values', { params })
+  const response = await api.get('/lookup-values/', { params })
   return response.data
 }
 
@@ -378,7 +378,7 @@ export const fetchLookupValues = async (
  * Create a new lookup value
  */
 export const createLookupValue = async (data: LookupValueCreate): Promise<LookupValue> => {
-  const response = await api.post('/lookup-values', data)
+  const response = await api.post('/lookup-values/', data)
   return response.data
 }
 
@@ -413,12 +413,12 @@ import type { Metal, MetalCreate, MetalUpdate, MetalPriceResponse } from '../typ
 export const fetchMetals = async (includeInactive?: boolean): Promise<Metal[]> => {
   const params: Record<string, boolean> = {}
   if (includeInactive) params.include_inactive = true
-  const response = await api.get('/metals', { params })
+  const response = await api.get('/metals/', { params })
   return response.data
 }
 
 export const createMetal = async (data: MetalCreate): Promise<Metal> => {
-  const response = await api.post('/metals', data)
+  const response = await api.post('/metals/', data)
   return response.data
 }
 
@@ -492,7 +492,7 @@ import type { OrderCreateWithDeposit, OrderUpdate } from '../types/order'
  * Requirements: 3.9, 5.8
  */
 export const createOrderWithDeposit = async (data: OrderCreateWithDeposit): Promise<Order> => {
-  const response = await api.post('/orders', data)
+  const response = await api.post('/orders/', data)
   return response.data
 }
 
@@ -524,7 +524,7 @@ export const fetchOrders = async (params?: {
   company_id?: number
   contact_id?: number
 }): Promise<Order[]> => {
-  const response = await api.get('/orders', { params })
+  const response = await api.get('/orders/', { params })
   return response.data
 }
 
