@@ -492,7 +492,7 @@ import type { OrderCreateWithDeposit, OrderUpdate } from '../types/order'
  * Requirements: 3.9, 5.8
  */
 export const createOrderWithDeposit = async (data: OrderCreateWithDeposit): Promise<Order> => {
-  const response = await api.post('/orders', data)
+  const response = await api.post('/orders/', data)
   return response.data
 }
 
@@ -524,7 +524,7 @@ export const fetchOrders = async (params?: {
   company_id?: number
   contact_id?: number
 }): Promise<Order[]> => {
-  const response = await api.get('/orders', { params })
+  const response = await api.get('/orders/', { params })
   return response.data
 }
 
