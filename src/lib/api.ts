@@ -15,12 +15,21 @@ export const api = axios.create({
   decompress: true,
 })
 
-// Request interceptor - add auth token
+// Request interceptor - add auth token and normalize URLs
 api.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().token
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
+    }
+    // Ensure trailing slash on API paths to avoid 307 redirects behind API Gateway
+    if (config.url && !config.url.endsWith('/')) {
+      // Don't add slash if URL has a file-like segment (e.g. /price/GOLD_24K)
+      const lastSegment = config.url.split('/').pop() || ''
+      const looksLikeResource = /^\d+$/.test(lastSegment) || lastSegment.includes('.')
+      if (!looksLikeResource) {
+        config.url += '/'
+      }
     }
     return config
   },
