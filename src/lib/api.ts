@@ -15,21 +15,12 @@ export const api = axios.create({
   decompress: true,
 })
 
-// Request interceptor - add auth token and normalize URLs
+// Request interceptor - add auth token
 api.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().token
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
-    }
-    // Ensure trailing slash on API paths to avoid 307 redirects behind API Gateway
-    if (config.url && !config.url.endsWith('/')) {
-      // Don't add slash if URL has a file-like segment (e.g. /price/GOLD_24K)
-      const lastSegment = config.url.split('/').pop() || ''
-      const looksLikeResource = /^\d+$/.test(lastSegment) || lastSegment.includes('.')
-      if (!looksLikeResource) {
-        config.url += '/'
-      }
     }
     return config
   },
@@ -150,7 +141,7 @@ export const fetchContacts = async (params?: {
   search?: string
   company_id?: number
 }): Promise<Contact[]> => {
-  const response = await api.get('/contacts', { params })
+  const response = await api.get('/contacts/', { params })
   return response.data
 }
 
@@ -166,7 +157,7 @@ export const fetchContactById = async (id: number): Promise<Contact> => {
  * Create a new contact
  */
 export const createContact = async (data: ContactCreate): Promise<Contact> => {
-  const response = await api.post('/contacts', data)
+  const response = await api.post('/contacts/', data)
   return response.data
 }
 
@@ -209,7 +200,7 @@ export const fetchCompanies = async (params?: {
   search?: string
   include_balance?: boolean
 }): Promise<Company[]> => {
-  const response = await api.get('/companies-v2', { params })
+  const response = await api.get('/companies-v2/', { params })
   return response.data
 }
 
@@ -228,7 +219,7 @@ export const fetchCompanyById = async (
  * Create a new company
  */
 export const createCompany = async (data: CompanyCreate): Promise<Company> => {
-  const response = await api.post('/companies-v2', data)
+  const response = await api.post('/companies-v2/', data)
   return response.data
 }
 
@@ -379,7 +370,7 @@ export const fetchLookupValues = async (
   const params: Record<string, string | boolean> = {}
   if (category) params.category = category
   if (includeInactive) params.include_inactive = true
-  const response = await api.get('/lookup-values', { params })
+  const response = await api.get('/lookup-values/', { params })
   return response.data
 }
 
@@ -387,7 +378,7 @@ export const fetchLookupValues = async (
  * Create a new lookup value
  */
 export const createLookupValue = async (data: LookupValueCreate): Promise<LookupValue> => {
-  const response = await api.post('/lookup-values', data)
+  const response = await api.post('/lookup-values/', data)
   return response.data
 }
 
@@ -422,12 +413,12 @@ import type { Metal, MetalCreate, MetalUpdate, MetalPriceResponse } from '../typ
 export const fetchMetals = async (includeInactive?: boolean): Promise<Metal[]> => {
   const params: Record<string, boolean> = {}
   if (includeInactive) params.include_inactive = true
-  const response = await api.get('/metals', { params })
+  const response = await api.get('/metals/', { params })
   return response.data
 }
 
 export const createMetal = async (data: MetalCreate): Promise<Metal> => {
-  const response = await api.post('/metals', data)
+  const response = await api.post('/metals/', data)
   return response.data
 }
 
