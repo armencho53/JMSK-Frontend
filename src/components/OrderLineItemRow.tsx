@@ -111,24 +111,20 @@ export default function OrderLineItemRow({
         />
       </td>
 
-      {/* Initial Total Weight */}
+      {/* Initial Total Weight (auto-calculated: quantity × target_weight_per_piece) */}
       <td className="min-w-[100px] px-2 py-2">
         <input
           type="number"
           id={`line-item-${index}-initial-weight`}
-          min="0"
-          step="0.01"
-          value={lineItem.initial_total_weight || ''}
-          onChange={(e) =>
-            onChange(
-              index,
-              'initial_total_weight',
-              e.target.value ? parseFloat(e.target.value) : undefined
-            )
+          value={
+            lineItem.quantity && lineItem.target_weight_per_piece
+              ? (lineItem.quantity * lineItem.target_weight_per_piece).toFixed(2)
+              : ''
           }
-          className={inputClass('initial_total_weight')}
-          placeholder="0.00"
-          title={hasError('initial_total_weight') ? getErrorMessage('initial_total_weight') : undefined}
+          readOnly
+          className="block w-full border border-gray-200 bg-gray-50 rounded-md shadow-sm py-1.5 px-2 text-gray-500 sm:text-sm cursor-not-allowed"
+          placeholder="Auto"
+          title="Auto-calculated: Qty × Target Wt/Pc"
         />
       </td>
 
@@ -171,14 +167,17 @@ export default function OrderLineItemRow({
       </td>
 
       {/* Actions */}
-      <td className="min-w-[70px] px-2 py-2">
+      <td className="min-w-[50px] px-2 py-2 text-center">
         <button
           type="button"
           onClick={() => onRemove(index)}
           disabled={!canRemove}
-          className="text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+          className="text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Remove line item"
         >
-          Remove
+          <svg className="h-4 w-4 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
         </button>
       </td>
     </tr>

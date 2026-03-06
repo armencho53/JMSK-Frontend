@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import ContactSelector from './ContactSelector'
 import OrderLineItemRow from './OrderLineItemRow'
 import type { Order, OrderLineItem, MetalDepositCreate } from '../types/order'
 import type { Contact } from '../types/contact'
 import { useMetals } from '../hooks/useMetals'
 import { ORDER_STATUS_OPTIONS } from '../lib/constants'
-import { getMetalPrice } from '../lib/api'
+import api, { getMetalPrice } from '../lib/api'
 import type { MetalPriceResponse } from '../types/metal'
 
 interface OrderFormModalProps {
@@ -53,6 +54,17 @@ export default function OrderFormModal({
   const [priceLoading, setPriceLoading] = useState(false)
   const [priceError, setPriceError] = useState<string | null>(null)
   const { metals, isLoading: metalTypeLoading, isError: metalTypeError, refetch: refetchMetalTypes } = useMetals()
+
+  // Fetch company metal balances when editing an order (to show existing deposits)
+  const companyId = mode === 'edit' && order?.company_id ? order.company_id : undefined
+  const { data: companyBalances = [] } = useQuery<{ id: number; metal_id: number; metal_code: string; metal_name: string; balance_grams: number }[]>({
+    queryKey: ['company-metal-balances', companyId],
+    queryFn: async () => {
+      const response = await api.get(`/companies/${companyId}/metal-balances`)
+      return response.data
+    },
+    enabled: !!companyId && isOpen,
+  })
 
   useEffect(() => {
     if (isOpen) {
@@ -164,10 +176,16 @@ export default function OrderFormModal({
 
   const updateLineItem = (index: number, field: keyof OrderLineItem, value: any) => {
     const newLineItems = [...formData.line_items]
-    newLineItems[index] = {
-      ...newLineItems[index],
-      [field]: value,
+    const updated = { ...newLineItems[index], [field]: value }
+
+    // Auto-calculate initial_total_weight = quantity × target_weight_per_piece
+    if (field === 'quantity' || field === 'target_weight_per_piece') {
+      const qty = field === 'quantity' ? (value || 0) : (updated.quantity || 0)
+      const twp = field === 'target_weight_per_piece' ? (value || 0) : (updated.target_weight_per_piece || 0)
+      updated.initial_total_weight = qty && twp ? parseFloat((qty * twp).toFixed(2)) : undefined
     }
+
+    newLineItems[index] = updated
     setFormData({
       ...formData,
       line_items: newLineItems,
@@ -215,8 +233,13 @@ export default function OrderFormModal({
       return
     }
 
+    // Strip `id` and `metal_name` from line items before submitting
+    // (backend OrderLineItemCreate schema doesn't accept these fields)
+    const cleanedLineItems = formData.line_items.map(({ id, metal_name, ...rest }) => rest)
+
     const submitData: OrderFormData = {
       ...formData,
+      line_items: cleanedLineItems,
       metal_deposit: enableMetalDeposit ? metalDeposit : undefined,
     }
 
@@ -406,25 +429,52 @@ export default function OrderFormModal({
                 <div>
                   <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-200">
                     <h4 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">Metal Deposit (Optional)</h4>
-                    <label className="flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={enableMetalDeposit}
-                        onChange={(e) => setEnableMetalDeposit(e.target.checked)}
-                        disabled={!selectedContact}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded disabled:opacity-50"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">Enable deposit</span>
-                    </label>
+                    {mode === 'create' && (
+                      <label className="flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={enableMetalDeposit}
+                          onChange={(e) => setEnableMetalDeposit(e.target.checked)}
+                          disabled={!selectedContact}
+                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded disabled:opacity-50"
+                        />
+                        <span className="ml-2 text-sm text-gray-700">Enable deposit</span>
+                      </label>
+                    )}
                   </div>
 
-                  {!selectedContact && (
+                  {/* Show existing company metal balances in edit mode */}
+                  {mode === 'edit' && companyBalances.length > 0 && (
+                    <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <p className="text-sm font-medium text-blue-800 mb-2">Existing Company Metal Balances</p>
+                      <div className="space-y-1">
+                        {companyBalances.map((b) => (
+                          <div key={b.id} className="flex justify-between text-sm">
+                            <span className="text-blue-700">{b.metal_name} <span className="text-blue-400 font-mono text-xs">({b.metal_code})</span></span>
+                            <span className={`font-medium ${b.balance_grams < 0 ? 'text-red-600' : 'text-blue-900'}`}>
+                              {b.balance_grams.toFixed(2)}g
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="mt-2 text-xs text-blue-600">
+                        Deposits already recorded for this company. To add more, visit the company page.
+                      </p>
+                    </div>
+                  )}
+                  {mode === 'edit' && companyBalances.length === 0 && (
+                    <p className="text-sm text-gray-500 italic mb-4">
+                      No metal deposits recorded for this company yet.
+                    </p>
+                  )}
+
+                  {mode === 'create' && !selectedContact && (
                     <p className="text-sm text-gray-500 italic">
                       Select a contact first to enable metal deposit
                     </p>
                   )}
 
-                  {enableMetalDeposit && selectedContact && (
+                  {mode === 'create' && enableMetalDeposit && selectedContact && (
                     <div className="space-y-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
                       {/* Metal Type */}
                       <div>
