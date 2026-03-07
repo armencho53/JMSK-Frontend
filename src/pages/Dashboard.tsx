@@ -286,9 +286,8 @@ export default function Dashboard() {
               {supplies && supplies.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   {supplies.slice(0, 5).map((supply: any) => (
-                    <Link 
+                    <div 
                       key={supply.id} 
-                      to={`/supplies/${supply.id}`}
                       style={{ 
                         display: 'flex', 
                         alignItems: 'center', 
@@ -296,11 +295,7 @@ export default function Dashboard() {
                         padding: '16px', 
                         backgroundColor: '#f8fafc', 
                         borderRadius: '8px',
-                        textDecoration: 'none',
-                        transition: 'background-color 0.2s'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e2e8f0'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <div style={{ 
@@ -326,7 +321,7 @@ export default function Dashboard() {
                           Available
                         </p>
                       </div>
-                    </Link>
+                    </div>
                   ))}
                 </div>
               ) : (
