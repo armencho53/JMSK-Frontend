@@ -150,11 +150,13 @@ export default function LedgerEntryFormModal({
   }, [selectedOrder])
 
   // Filtered orders for searchable dropdown (Req 8.2)
+  // Exclude completed orders — ledger entries only apply to active orders
   const filteredOrders = useMemo(() => {
     if (!orders) return []
-    if (!orderSearch.trim()) return orders
+    const activeOrders = orders.filter((o) => o.status !== 'COMPLETED')
+    if (!orderSearch.trim()) return activeOrders
     const q = orderSearch.toLowerCase()
-    return orders.filter(
+    return activeOrders.filter(
       (o) =>
         o.order_number.toLowerCase().includes(q) ||
         (o.product_description ?? '').toLowerCase().includes(q) ||
