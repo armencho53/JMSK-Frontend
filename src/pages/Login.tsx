@@ -8,7 +8,7 @@ import { Card } from '../components/ui/Card'
 import { Container } from '../components/ui/Container'
 
 export default function Login() {
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
   const [error, setError] = useState('')
@@ -21,18 +21,11 @@ export default function Login() {
     setError('')
     setLoading(true)
 
-    console.log('Login attempt:', { email, password: '***', rememberMe })
-    console.log('API Base URL:', api.defaults.baseURL)
-
     try {
-      // Send email, password, and remember_me as form data
       const formData = new URLSearchParams()
-      formData.append('username', email)
+      formData.append('username', username)
       formData.append('password', password)
       formData.append('remember_me', rememberMe.toString())
-
-      console.log('Sending login request to:', `${api.defaults.baseURL}/auth/login`)
-      console.log('Form data:', formData.toString())
 
       const { data } = await api.post('/auth/login', formData, {
         headers: {
@@ -40,32 +33,16 @@ export default function Login() {
         },
       })
 
-      console.log('Login successful, tokens received:', { 
-        hasAccessToken: !!data.access_token,
-        hasRefreshToken: !!data.refresh_token 
-      })
-
       // Set tokens first so they're available for the next request
       setAuth(data.access_token, data.refresh_token, null as any)
 
       // Fetch actual user data
-      console.log('Fetching user data...') // Debug log
       const userResponse = await api.get('/auth/me')
       const user = userResponse.data
 
-      console.log('User data received:', user) // Debug log
       setAuth(data.access_token, data.refresh_token, user)
       navigate('/')
     } catch (err: any) {
-      console.error('Login error details:', {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        headers: err.response?.headers,
-        message: err.message
-      })
-      
-      // Handle different error formats
       let errorMessage = 'Login failed'
       if (err.response?.data?.detail) {
         if (typeof err.response.data.detail === 'string') {
@@ -106,13 +83,12 @@ export default function Login() {
               
               <div className="space-y-4">
                 <Input
-                  type="email"
-                  label="Email address"
+                  type="text"
+                  label="Username"
                   variant="floating"
                   required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  error={error && error.includes('email') ? error : undefined}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
                 
                 <Input
@@ -122,7 +98,6 @@ export default function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  error={error && error.includes('password') ? error : undefined}
                 />
               </div>
 

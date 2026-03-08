@@ -71,12 +71,12 @@ export default function Layout() {
             <div className="flex items-center space-x-3 mb-3">
               <div className="w-8 h-8 bg-slate-700 rounded-full flex items-center justify-center">
                 <span className="text-slate-300 text-sm font-medium">
-                  {user?.email?.charAt(0).toUpperCase() || 'U'}
+                  {user?.username?.charAt(0).toUpperCase() || 'U'}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">
-                  {user?.email || 'User'}
+                  {user?.username || 'User'}
                 </p>
                 <p className="text-xs text-slate-400 truncate">
                   Tenant ID: {user?.tenant_id || 'N/A'}
