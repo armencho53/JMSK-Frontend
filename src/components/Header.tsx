@@ -146,7 +146,7 @@ export default function Header({ onMobileMenuToggle, sidebarCollapsed }: HeaderP
                       {user?.full_name || 'User'}
                     </div>
                     <div className="text-xs text-slate-500">
-                      {user?.email}
+                      {user?.username}
                     </div>
                   </div>
                 </div>
@@ -174,7 +174,7 @@ export default function Header({ onMobileMenuToggle, sidebarCollapsed }: HeaderP
                         {user?.full_name}
                       </div>
                       <div className="text-sm text-slate-500">
-                        {user?.email}
+                        {user?.username}
                       </div>
                     </div>
 
