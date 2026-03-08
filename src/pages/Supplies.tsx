@@ -245,7 +245,7 @@ export default function Supplies() {
     setMetalFormError('')
   }
 
-  const handleMetalSubmit = (data: { code: string; name: string; fine_percentage: number; average_cost_per_gram?: number | null }) => {
+  const handleMetalSubmit = (data: { code: string; name: string; metal_type: import('../types/metal').MetalType; fine_percentage: number; average_cost_per_gram?: number | null }) => {
     setMetalFormError('')
     if (metalFormState.mode === 'create') {
       createMetal.mutate(data, {
