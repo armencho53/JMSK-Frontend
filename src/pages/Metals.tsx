@@ -38,7 +38,7 @@ export default function Metals() {
     setFormError('')
   }
 
-  const handleSubmit = (data: { code: string; name: string; fine_percentage: number; average_cost_per_gram?: number | null }) => {
+  const handleSubmit = (data: { code: string; name: string; metal_type: import('../types/metal').MetalType; fine_percentage: number; average_cost_per_gram?: number | null }) => {
     setFormError('')
     if (formState.mode === 'create') {
       createMetal.mutate(data, {
@@ -118,6 +118,7 @@ export default function Metals() {
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Code</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Name</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Fine %</th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Avg Cost/g</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
@@ -137,6 +138,11 @@ export default function Metals() {
                     <td className="px-4 py-3 whitespace-nowrap text-sm">
                       <span className={metal.is_active ? 'text-slate-700' : 'text-slate-400 line-through'}>
                         {metal.name}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700">
+                        {metal.metal_type}
                       </span>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-right text-slate-700">

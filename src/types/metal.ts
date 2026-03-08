@@ -1,8 +1,13 @@
+export type MetalType = 'GOLD' | 'SILVER' | 'PLATINUM' | 'PALLADIUM' | 'OTHER'
+
+export const METAL_TYPES: MetalType[] = ['GOLD', 'SILVER', 'PLATINUM', 'PALLADIUM', 'OTHER']
+
 export interface Metal {
   id: number
   tenant_id: number
   code: string
   name: string
+  metal_type: MetalType
   fine_percentage: number
   average_cost_per_gram: number | null
   is_active: boolean
@@ -13,12 +18,14 @@ export interface Metal {
 export interface MetalCreate {
   code: string
   name: string
+  metal_type: MetalType
   fine_percentage: number
   average_cost_per_gram?: number | null
 }
 
 export interface MetalUpdate {
   name?: string
+  metal_type?: MetalType
   fine_percentage?: number
   average_cost_per_gram?: number | null
   is_active?: boolean
@@ -26,7 +33,6 @@ export interface MetalUpdate {
 
 /**
  * Metal price response from price lookup API
- * Requirements: 8.1, 8.2, 8.8
  */
 export interface MetalPriceResponse {
   metal_code: string

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
-import type { Metal } from '../types/metal'
+import type { Metal, MetalType } from '../types/metal'
+import { METAL_TYPES } from '../types/metal'
 
 interface MetalFormModalProps {
   isOpen: boolean
   onClose: () => void
   mode: 'create' | 'edit'
   metal?: Metal | null
-  onSubmit: (data: { code: string; name: string; fine_percentage: number; average_cost_per_gram?: number | null }) => void
+  onSubmit: (data: { code: string; name: string; metal_type: MetalType; fine_percentage: number; average_cost_per_gram?: number | null }) => void
   isSubmitting: boolean
   apiError?: string
 }
@@ -22,6 +23,7 @@ export default function MetalFormModal({
 }: MetalFormModalProps) {
   const [code, setCode] = useState('')
   const [name, setName] = useState('')
+  const [metalType, setMetalType] = useState<MetalType>('OTHER')
   const [finePercentage, setFinePercentage] = useState('')
   const [avgCost, setAvgCost] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -31,11 +33,13 @@ export default function MetalFormModal({
       if (mode === 'edit' && metal) {
         setCode(metal.code)
         setName(metal.name)
+        setMetalType(metal.metal_type)
         setFinePercentage((metal.fine_percentage * 100).toString())
         setAvgCost(metal.average_cost_per_gram?.toString() || '')
       } else {
         setCode('')
         setName('')
+        setMetalType('OTHER')
         setFinePercentage('')
         setAvgCost('')
       }
@@ -72,6 +76,7 @@ export default function MetalFormModal({
     onSubmit({
       code: code.trim().toUpperCase(),
       name: name.trim(),
+      metal_type: metalType,
       fine_percentage: parseFloat(finePercentage) / 100,
       average_cost_per_gram: avgCost ? parseFloat(avgCost) : null,
     })
@@ -109,6 +114,21 @@ export default function MetalFormModal({
                   placeholder="e.g., GOLD_18K"
                 />
                 {errors.code && <p className="mt-1 text-sm text-red-600">{errors.code}</p>}
+              </div>
+              <div>
+                <label htmlFor="metal-type" className="block text-sm font-medium text-gray-700">
+                  Metal Type <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="metal-type"
+                  value={metalType}
+                  onChange={(e) => setMetalType(e.target.value as MetalType)}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                >
+                  {METAL_TYPES.map((t) => (
+                    <option key={t} value={t}>{t}</option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label htmlFor="metal-name" className="block text-sm font-medium text-gray-700">
